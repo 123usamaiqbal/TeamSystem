@@ -1,0 +1,53 @@
+﻿@model TeamManageSystem.Models.Account.Rating
+@{
+    ViewData["Title"] = "BonusGenerate";
+    Layout = "~/Views/Shared/_Layout_forDashboard.cshtml";
+}
+
+<style>
+    body {
+        background-image: url('https://img.freepik.com/free-photo/background_53876-32169.jpg'); /* Replace 'path/to/your/image.jpg' with the path to your image */
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center center;
+    }
+    .container {
+        display: flex;
+        justify-content: center;
+    }
+    .card {
+        width: 450px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 10px;
+        margin-bottom: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        background-color: aliceblue;
+    }
+
+    h1 {
+        margin-bottom: 10px;
+    }
+
+    .rounded-button {
+        height: 45px;
+        width: 45px;
+        border-radius: 50%; /* Set border radius to 50% to create a circular button */
+        padding: 10px; /* Add padding for spacing within the circular button */
+    }
+</style>
+
+<h1 class="text-center">Bonus Generate</h1>
+<div>
+    <a asp-action="TDashboard" class="btn btn-light m-2 rounded-button">
+        <i class="fas fa-arrow-left" style="color:black"></i>
+    </a>
+</div>
+<div class="container">
+<div class="card">
+    <p><strong>Member Name:</strong> @Model.MemberName</p>
+    <p><strong>Rating:</strong> @Model.Ratings</p>
+    <p><strong>Bonus:</strong> @ViewBag.BonusRating</p>
+    <p><strong>Message:</strong> @ViewBag.Message</p>
+</div>
+</div>

@@ -1,0 +1,56 @@
+﻿@model TeamManageSystem.Models.Account.Rating
+@{
+    ViewData["Title"] = "AddFeedback";
+    Layout = "~/Views/Shared/_Layout_forDashboard.cshtml";
+}
+<style>
+    body {
+        background-image: url('https://img.freepik.com/free-photo/background_53876-32169.jpg'); /* Replace 'path/to/your/image.jpg' with the path to your image */
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center center;
+    }
+
+    .rounded-button {
+        height: 45px;
+        width: 45px;
+        border-radius: 50%; /* Set border radius to 50% to create a circular button */
+        padding: 10px; /* Add padding for spacing within the circular button */
+    }
+
+    .custom-btn {
+        background-color: antiquewhite; /* Replace with your desired background color */
+        color: black; /* Replace with your desired text color */
+        /* Add any other custom styling you need */
+    }
+</style>
+<div style="display: flex; align-items: center; justify-content: space-between;">
+    <a asp-action="ViewTeam" class="btn custom-btn m-2 rounded-button">
+        <i class="fas fa-arrow-left" style="color: black;"></i>
+    </a>
+    <h3 class="text-center" style="color:white; margin: 0; flex-grow: 1;">Add Feedback Compulsry before Generate Bonus</h3>
+</div>
+
+<div class="container">
+    <div class="row mt-lg-5">
+        <div class="col-4 offset-4 border rounded p-lg-4" style="background-color:lightcyan">
+            <div class="text-center">
+                <h3 class="">Add Feedback</h3>
+            </div>
+            <form method="post" asp-action="AddFeedback">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="MemberId" value="@Context.Request.Query["id"]" />
+                <div class="form-group">
+                    <label asp-for="FeedBack"></label>
+                    <h5>   </h5>
+                    <input type="text" asp-for="FeedBack" placeholder="Enter Feedback Here" class="form-control" autocomplete="off" />
+                </div>
+                <h5>    </h5>
+                <div class="form-group">
+                    <input type="submit" class="btn btn-primary float-lg-end" value=" Add " />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+

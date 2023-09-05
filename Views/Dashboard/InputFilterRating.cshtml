@@ -1,0 +1,55 @@
+﻿@model TeamManageSystem.Models.ViewModel.SprintViewModel
+@{
+    ViewData["Title"] = "InputFilterRating";
+    Layout = "~/Views/Shared/_Layout_forDashboard.cshtml";
+}
+<style>
+    body {
+        background-image: url('https://img.freepik.com/free-photo/background_53876-32169.jpg'); /* Replace 'path/to/your/image.jpg' with the path to your image */
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center center;
+    }
+
+    .rounded-button {
+        height: 45px;
+        width: 45px;
+        border-radius: 50%; /* Set border radius to 50% to create a circular button */
+        padding: 10px; /* Add padding for spacing within the circular button */
+    }
+
+    .custom-btn {
+        background-color: antiquewhite; /* Replace with your desired background color */
+        color: black; /* Replace with your desired text color */
+        /* Add any other custom styling you need */
+    }
+</style>
+<div class="container">
+    <div class="row mt-lg-5">
+        <div class="col-4 offset-4 border rounded p-lg-4" style="background-color:lightcyan;">
+            <div class="text-center">
+                <h3 class="text-info">FILTERED SPRINT DATES</h3>
+            </div>
+            <form method="post" asp-action="SpecificRating">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Id" />
+                <div class="form-group">
+                    <label asp-for="StartDate"></label>
+                    <h5>   </h5>
+                    <input type="date" asp-for="StartDate" placeholder="Enter sprint title" class="form-control" autocomplete="off" />
+                </div>
+                <div><h5>  </h5></div>
+                <div class="form-group">
+                    <label asp-for="EndDate"></label>
+                    <h5>     </h5>
+                    <input type="date" asp-for="EndDate" placeholder="Enter start date" class="form-control" autocomplete="off" />
+                </div>
+                <h5>    </h5>
+                <div class="form-group">
+                    <input type="submit" class="btn btn-primary float-lg-end" value="Specific Rating" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+

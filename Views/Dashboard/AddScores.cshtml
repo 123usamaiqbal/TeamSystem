@@ -1,0 +1,201 @@
+﻿@model TeamManageSystem.Models.Account.ScoresModel
+@{
+    ViewData["Title"] = "AddScores";
+    Layout = "~/Views/Shared/_Layout_forDashboard.cshtml";
+}
+<style>
+    .custom-btn {
+        background-color: antiquewhite; /* Replace with your desired background color */
+        color: black; /* Replace with your desired text color */
+        /* Add any other custom styling you need */
+    }
+    .table thead th:nth-child(1),
+    .table tbody td:nth-child(1) {
+        width: 200px; /* Adjust the value as needed */
+    }
+
+    .table thead th:nth-child(2),
+    .table tbody td:nth-child(2) {
+        width: 300px; /* Adjust the value as needed */
+    }
+
+    /* Custom CSS for radio buttons */
+    .btn-group .btn-secondary input[type="radio"]:checked + i {
+        color: gold;
+    }
+
+    .rating-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-inline:20px;
+    }
+
+    body {
+        background-image: url('https://img.freepik.com/free-photo/background_53876-32169.jpg'); /* Replace 'path/to/your/image.jpg' with the path to your image */
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center center;
+    }
+
+    .rounded-button {
+        height: 45px;
+        width: 45px;
+        border-radius: 50%; /* Set border radius to 50% to create a circular button */
+        padding: 10px; /* Add padding for spacing within the circular button */
+
+    }
+
+    .btn-custom-green {
+        background-color: #00cc00; /* Green color */
+        color: white; /* Text color */
+        /* Add any additional styling */
+    }
+
+    /* Custom styles for the "Remove Member" button */
+    .btn-custom-red {
+        background-color: #ff0000; /* Red color */
+        color: white; /* Text color */
+        /* Add any additional styling */
+    }
+</style>
+<div style="text-align: left;">
+    <a asp-action="ViewSprints" class="btn custom-btn m-2 rounded-button">
+        <i class="fas fa-arrow-left" style="color:black"></i>
+    </a>
+</div>
+<div class="col-6 offset-3 border rounded p-lg-4" style="background-color: lightcyan; margin-top: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h2>Manage Scores</h2>
+        <div>
+            <a asp-action="AddsprintMember" asp-route-SprintId="@Context.Request.Query["id"]" class="btn btn-success m-2 small-button" title="Add Member">
+                <i class="fas fa-user-plus small-icon"></i>
+            </a>
+        </div>
+    </div>
+    <hr />
+    <form id="ratingForm" method="post" action="@Url.Action("AddScores", "Dashboard")">
+        <table>
+            <thead>
+                <tr style="background-color: lightcyan">
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="SprintID" value="@Context.Request.Query["id"]" />
+                @for (int i = 0; i < Model.RatingViewModel.Count; i++)
+                {
+          
+                    <tr>
+                        <td>@Model.RatingViewModel[i].MemberName</td>
+                        <td>
+                            
+                            <input type="hidden" name="viewModelList[@i].MemberID" value="@Model.RatingViewModel[i].MemberID" />
+                            
+                            <div class="rating-container">
+                                <label class="btn btn-secondary">
+                                    <input type="radio" name="viewModelList[@i].SprintRating" value="1" /> <i class="fas fa-thumbs-down"></i>
+                                </label>
+                                <label class="btn btn-secondary">
+                                    <input type="radio" name="viewModelList[@i].SprintRating" value="2" /> <i class="fas fa-meh"></i>
+                                </label>
+                                <label class="btn btn-secondary">
+                                    <input type="radio" name="viewModelList[@i].SprintRating" value="3" /> <i class="fas fa-thumbs-up"></i>
+                                </label>
+                                <label class="btn btn-secondary">
+                                    <input type="radio" name="viewModelList[@i].SprintRating" value="4" /> <i class="fas fa-smile"></i>
+                                </label>
+                                <label class="btn btn-secondary">
+                                    <input type="radio" name="viewModelList[@i].SprintRating" value="5" /> <i class="fas fa-grin-stars"></i>
+                                </label>
+                            </div>
+                        </td>
+                        <td>
+                            <a asp-action="DeleteSprintMember" asp-route-SprintId="@Context.Request.Query["id"]" asp-route-MemberId="@Model.RatingViewModel[i].MemberID" class="btn btn-custom-red m-2 small-button" title="Remove @Model.RatingViewModel[i].MemberName">
+                                <i class="fas fa-trash small-icon"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
+            <button type="submit" class="btn btn-info">
+                <i class="fas fa-save"></i> Save
+            </button>
+        </div>
+        <!--<input type="submit" class="btn btn-primary" value="Save Ratings" />-->
+    </form>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+ <script>
+     //again set item in local storage
+    document.addEventListener("DOMContentLoaded", function () {
+        var ratingsData = @Html.Raw(Json.Serialize(Model.SprintRatings.Where(sr => sr.IsDelete==0).ToList()));
+        var sprintIdInputs = document.querySelector('input[name="SprintID"]');
+        var SprintIds = sprintIdInputs.value;
+        localStorage.setItem("sprintRatings_" + SprintIds, JSON.stringify(ratingsData));
+        // get items from local storage
+        var form = document.getElementById("ratingForm");
+        var sprintIdInput = document.querySelector('input[name="SprintID"]');
+
+        if (form && sprintIdInput) {
+            var storedSprintId = sprintIdInput.value;
+         //  var formData = localStorage.getItem("ratingFormData");
+           
+            var sprintRatingsData = localStorage.getItem("sprintRatings_" + storedSprintId);
+
+            if (sprintRatingsData) {
+                var sprintRatings = JSON.parse(sprintRatingsData);
+                for (var i = 0; i < sprintRatings.length; i++) {
+                    var memberRating = sprintRatings[i];
+                    var memberRadio = form.querySelector('input[name="viewModelList[' + i + '].SprintRating"][value="' + memberRating.sRating + '"]');
+                    if (memberRadio) {
+                        memberRadio.checked = true;
+                    }
+                }
+            }
+
+           /* if (formData) {
+                var data = JSON.parse(formData);
+                for (var i = 0; i < data.length; i++) {
+                    var radio = form.querySelector('input[name="viewModelList[' + i + '].SprintRating"][value="' + data[i] + '"]');
+                    if (radio) {
+                        radio.checked = true;
+                    }
+                }
+              } <a asp-action="RemoveMember" asp-route-SprintId="@Context.Request.Query["id"]" class="btn btn-custom-red m-2 small-button" title="Remove Member">
+                 <i class="fas fa-trash small-icon"></i>
+             </a>*/
+
+        }
+    });
+   /* document.addEventListener("DOMContentLoaded", function () {
+        var removeButtons = document.querySelectorAll('.remove-button');
+        debugger;
+        removeButtons.forEach(function (button) {
+            button.addEventListener('click', function () {
+                var sprintId = this.getAttribute('data-sprint-id');
+                var memberId = this.getAttribute('data-member-id');
+
+                if (confirm('Are you sure you want to remove this member?')) {
+                    $.ajax({
+                        url: '@Url.Action("RemoveMember", "Dashboard")',
+                        data: { SprintID: sprintId, MemberID: memberId },
+                        type: 'GET',
+                        success: function (data) {
+                            // Handle the response, such as refreshing the page or updating content
+                            // For example, you can reload the page to reflect the changes
+                            location.reload();
+                        },
+                        error: function (error) {
+                            console.error('Error:', error);
+                        }
+                    });
+                }
+            });
+        });
+    });*/
+</script>

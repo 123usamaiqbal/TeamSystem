@@ -1,0 +1,162 @@
+﻿@model TeamManageSystem.Models.Account.TeamRating
+@{
+    ViewData["Title"] = "ViewAllMembers";
+    Layout = "~/Views/Shared/_Layout_forDashboard.cshtml";
+}
+@{
+    var minRating = Model.TeamRatings.Min(sr => sr.Ratings);
+    var membersWithMinRating = Model.TeamRatings.Where(sr => sr.Ratings == minRating).Select(sr => sr.MemberName).Distinct();
+    var membersList = string.Join(", ", membersWithMinRating);
+}
+
+<div class="alert">
+    <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+     Low Rated Members: @membersList
+</div>
+<div class="d-flex justify-content-between align-items-center">
+    <div>
+        <a asp-action="ADashboard" class="btn custom-btn m-2 rounded-button">
+            <i class="fas fa-arrow-left" style="color:black"></i>
+        </a>
+    </div>
+    <h1 class="text-center" style="color:black">Members</h1>
+    <div>
+        <a href="@Url.Action("DownloadExcel", "Dashboard", new { membersJson = Json.Serialize(Model) })" class="btn btn-warning" style="padding: 10px 20px; cursor: pointer;">
+            <i class="fas fa-download" style="margin-right: 5px;"></i>Excel
+        </a>
+        <a href="@Url.Action("DownloadReport", "Dashboard", new { membersJson = Json.Serialize(Model) })" class="btn btn-warning" style="padding: 10px 20px; cursor: pointer;">
+            <i class="fas fa-download" style="margin-right: 5px;"></i>Pdf
+        </a>
+    </div>
+</div>
+
+<style>
+    /* The alert message box */
+    .alert {
+        padding: 20px;
+        background-color: #f44336; /* Red */
+        color: white;
+        margin-bottom: 15px;
+    }
+
+    /* The close button */
+    .closebtn {
+        margin-left: 15px;
+        color: white;
+        font-weight: bold;
+        float: right;
+        font-size: 22px;
+        line-height: 20px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+        /* When moving the mouse over the close button */
+        .closebtn:hover {
+            color: black;
+        }
+    body {
+        background-image: url('https://img.freepik.com/free-photo/background_53876-32169.jpg'); /* Replace 'path/to/your/image.jpg' with the path to your image */
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center center;
+    }
+    .rounded-button {
+        height: 45px;
+        width: 45px;
+        border-radius: 50%; /* Set border radius to 50% to create a circular button */
+        padding: 10px; /* Add padding for spacing within the circular button */
+    }
+    /* Set a fixed width for the first two columns */
+    .table thead th:nth-child(1),
+    .table thead th:nth-child(2),
+    .table thead th:nth-child(3),
+    .table tbody td:nth-child(1),
+    .table tbody td:nth-child(2),
+    .table tbody td:nth-child(3) {
+        width: 300px; /* Adjust the value as needed */
+    }
+
+    /* Set a percentage width for the third column */
+    .table thead th:nth-child(4)
+    .table tbody td:nth-child(4) {
+        width: 12%; /* Adjust the value as needed */
+    }
+
+    .table thead th:nth-child(5),
+    .table tbody td:nth-child(5) {
+        width: 12%; /* Adjust the value as needed */
+    }
+
+    .table thead th:nth-child(6),
+    .table tbody td:nth-child(6) {
+        width: 10%; /* Adjust the value as needed */
+    }
+
+    .table thead th:nth-child(7),
+    .table tbody td:nth-child(7) {
+        width: 4%; /* Adjust the value as needed */
+    }
+
+    .table thead th:nth-child(8),
+    .table tbody td:nth-child(8) {
+        width: 7%; /* Adjust the value as needed */
+    }
+
+    .custom-btn {
+        background-color: antiquewhite; /* Replace with your desired background color */
+        color: black; /* Replace with your desired text color */
+        /* Add any other custom styling you need */
+    }
+</style>
+
+<table class="table" style="border: 1px solid #ccc; background-color: lightcyan" id="dataTableData">
+    <thead>
+        <tr style="background-color: lightcyan">
+            <th>
+                <h6>Member Name</h6>
+            </th>
+            <th>
+                <h6>Position</h6>
+            </th>
+            <th>
+                <h6>Salary</h6>
+            </th>
+            <th>
+                <h6>Rating</h6>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.TeamMembers)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TMname)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Role)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Salary)
+                </td>
+                <td>
+                    @{
+                        var matchingRating = Model.TeamRatings.FirstOrDefault(r => r.MemberName == item.TMname);
+                        if (matchingRating != null)
+                        {
+                            <span>@matchingRating.Ratings</span>
+                        }
+                        else
+                        {
+                            <span>No Rating</span>
+                        }
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@section scripts{
+<script src="~/js/dataTable_file.js"></script>
+}

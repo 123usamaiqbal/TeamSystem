@@ -1,0 +1,68 @@
+﻿@model IEnumerable<TeamManageSystem.Models.Account.Task>
+@{
+    ViewData["Title"] = "ViewTasks";
+    Layout = "~/Views/Shared/_Layout_forDashboard.cshtml";
+}
+
+<h3 style="text-align: center;">VIEW TASKS</h3>
+<style>
+    /* Set a fixed width for the first two columns */
+    .table thead th:nth-child(1),
+    .table thead th:nth-child(2),
+    .table thead th:nth-child(3),
+    .table tbody td:nth-child(1),
+    .table tbody td:nth-child(2),
+    .table tbody td:nth-child(3) {
+        width: 330px; /* Adjust the value as needed */
+    }
+
+    .table thead th:nth-child(4),
+    .table tbody td:nth-child(4) {
+        width: 140px;
+    }
+
+    /* Set a percentage width for the third column */
+    /*.table thead th:nth-child(5),
+    .table tbody td:nth-child(5),
+    .table thead th:nth-child(4),
+    .table tbody td:nth-child(4) {
+        width: 10%;} /* Adjust the value as needed */
+</style>
+
+<table class="table" style="width: 900px; margin: 0 auto;">
+    <thead>
+        <tr style="background-color: darkseagreen">
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AssigneeName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TaskRate)
+            </th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AssigneeName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TaskRate)
+                </td>
+                <td>
+                    <a asp-action="AddTaskRating" asp-route-id="@item.Id" class="btn btn-outline-dark">Add Rating</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+

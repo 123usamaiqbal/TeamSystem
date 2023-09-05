@@ -1,0 +1,67 @@
+﻿@model TeamManageSystem.Models.Account.Sprint
+@{
+    ViewData["Title"] = "EditSprint";
+    Layout = "~/Views/Shared/_Layout_forDashboard.cshtml";
+}
+<style>
+    body {
+        background-image: url('https://img.freepik.com/free-photo/background_53876-32169.jpg'); /* Replace 'path/to/your/image.jpg' with the path to your image */
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center center;
+    }
+    /*body { background-image: url('path/to/your/image.jpg'); /* Replace 'path/to/your/image.jpg' with the actual image file path */ /*background-size: cover;*/ /* Adjust how the background image is displayed */ /* background-repeat: no-repeat;} */
+    .rounded-button {
+        height: 45px;
+        width: 45px;
+        border-radius: 50%; /* Set border radius to 50% to create a circular button */
+        padding: 10px; /* Add padding for spacing within the circular button */
+    }
+
+    .custom-btn {
+        background-color: antiquewhite; /* Replace with your desired background color */
+        color: black; /* Replace with your desired text color */
+        /* Add any other custom styling you need */
+    }</style>
+<div style="text-align: left;">
+    <a asp-action="ViewSprints" class="btn custom-btn m-2 rounded-button">
+        <i class="fas fa-arrow-left" style="color:black"></i>
+    </a>
+</div>
+<h1 class="text-center" style="margin-top:-60px;">Edit Sprint</h1>
+<div class="row">
+    <div class="col-md-4 offset-4 border" style="background-color: lightcyan; margin-top: -30px; margin-top:50px;">
+        <form asp-action="EditSprint" enctype="multipart/form-data" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div><h2>  </h2></div>
+            <div class="form-group" style="margin-top:15px;">
+                <label asp-for="Title" class="control-label"></label>
+                <input asp-for="Title" class="form-control" style="background-color: aliceblue;" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+            <div><h2>  </h2></div>
+            <div class="form-group">
+                <label asp-for="SDate" class="control-label"></label>
+                <input asp-for="SDate" class="form-control" style="background-color: aliceblue;" />
+                <span asp-validation-for="SDate" class="text-danger"></span>
+            </div>
+            <div><h2>  </h2></div>
+            <div class="form-group">
+                <label asp-for="EDate" class="control-label"></label>
+                <input asp-for="EDate" class="form-control" style="background-color: aliceblue;" />
+                <span asp-validation-for="EDate" class="text-danger"></span>
+            </div>
+            <div><h2>  </h2></div>
+            <div class="form-group">
+                <label asp-for="Discription" class="control-label"></label>
+                <input asp-for="Discription" class="form-control" placeholder="Add Discription Compulsry" style="background-color: aliceblue;" />
+            </div>
+            <div><h6>    </h6></div>
+            <div class="form-group text-center" style="margin-bottom:15px; margin-top:15px;">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+

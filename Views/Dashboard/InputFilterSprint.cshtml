@@ -1,0 +1,35 @@
+﻿@model TeamManageSystem.Models.ViewModel.SprintViewModel
+@{
+    ViewData["Title"] = "InputFilterSprint";
+    Layout = "~/Views/Shared/_Layout_forDashboard.cshtml";
+}
+<h2 class="text-center">Input Filtered Sprint Dates</h2>
+<hr />
+
+<div class="container">
+    <div class="row mt-lg-5">
+        <div class="col-4 offset-4 border border-primary rounded p-lg-4" style="background-color: lightcyan">
+            <div class="text-center">
+                <h3 class="text-info">FILTERED SPRINT DATES</h3>
+            </div>
+            <form method="post" asp-action="FilterSprints">
+                <div class="form-group">
+                    <label asp-for="StartDate"></label>
+                    <h5>   </h5>
+                    <input type="date" asp-for="StartDate" placeholder="Enter start title" class="form-control" autocomplete="off" />
+                </div>
+                <div><h5>  </h5></div>
+                <div class="form-group">
+                    <label asp-for="EndDate"></label>
+                    <h5>     </h5>
+                    <input type="date" asp-for="EndDate" placeholder="Enter end date" class="form-control" autocomplete="off" />
+                </div>
+                <h5>    </h5>
+                <div class="form-group">
+                    <input type="submit" class="btn btn-primary float-lg-end" value="Filter" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+

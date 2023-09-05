@@ -1,0 +1,67 @@
+﻿@model TeamManageSystem.Models.ViewModel.LoginSignUpViewModel
+@{
+    ViewData["Title"] = "Login";
+}
+
+<style>
+    .rounded-left-right {
+        border-radius: 25px 25px 25px 25px;
+    }
+
+    .custom-input {
+        height: 50%; /* Adjust the value to increase or decrease the height */
+    }
+
+    .custom-btn-width {
+        width: 100%; /* Adjust the value to increase or decrease the width */
+    }
+</style>
+<link rel="stylesheet" href="~/css/animation.css" />
+<div class="container">
+    <div class="row mt-lg-5">
+        <div class="col-4 offset-4 border rounded p-lg-4" style="background-color: lightcyan; margin-top: 3%;">
+            <div class="text-md-center">
+            </div>
+            <div class="text-center">
+                <img src="~/images//Nlogo1.jpg" alt="Logo" class="logo-image rounded-circle" style="height:30%; width:30%;" />
+            </div>
+            <h2>  </h2>
+            <h5 class="text-info text-center">Have an account?</h5>
+            <h6 class="text-success text-center">@TempData["successMessage"]</h6>
+            <form method="post" asp-action="Login">
+                <div class="form-group">
+                    <input type="text" asp-for="Username" placeholder="Enter username" class="form-control custom-input rounded-left-right" style="margin-top:5%;" autocomplete="off" />
+                    <span class="text-danger">@TempData["errorUsername"]</span>
+                </div>
+                <h2>  </h2>
+                <div class="form-group">
+                    <input id="pass" type="password" asp-for="Password" placeholder="Enter pasword" class="form-control custom-input rounded-left-right" style="margin-top:5%;" autocomplete="off" />
+                    <span class="text-danger">@TempData["errorPassword"]</span>
+                    <i id="open" class="fa fa-eye float-end" style="margin-top:-7%; margin-right:4%; cursor:pointer"></i>
+                    <i id="closed" class="fa fa-eye-slash float-end" style="margin-top:-7%; margin-right:4%; cursor:pointer; display:none"></i>
+                </div>
+                <h2>  </h2>
+                <div class="form-group text-center">
+                    <input type="submit" class="btn btn-block btn-info custom-btn-width rounded-left-right mb-2" style="margin-top:3%;" value="Log In" />
+                </div>
+            </form>
+            <a asp-action="SignUp" asp-controller="Account" class="btn btn-info position-absolute top-0 end-0" style="margin-top: 10px; margin-right: 10px;">Sign Up</a>
+        </div>
+    </div>
+</div>
+<script src="@Url.Content("~/lib/jquery/dist/jquery.js")"></script>
+<script src="@Url.Content("~/lib/jquery/dist/jquery.min.js")"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#open").click(function () {
+            $("#open").hide();
+            $("#closed").show();
+            $("#pass").attr("type","text");
+        });
+        $("#closed").click(function () {
+            $("#closed").hide();
+            $("#open").show();
+            $("#pass").attr("type","password");
+        });
+    });                                                                                                                                                                         
+</script>

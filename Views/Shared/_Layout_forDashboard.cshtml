@@ -1,0 +1,74 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<style>
+    .bg-custom-color {
+        background-color:lightcyan;
+    }
+</style>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - TeamManageSystem</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/TeamManageSystem.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="~/css/datatablecss/jquery.datatables.css" rel="stylesheet" />
+    <link href="~/css/datatablecss/jquery.datatables.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/custom-styles.css" asp-append-version="true" />
+
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-custom-color border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="" asp-controller="Dashboard" asp-action="Home"><img src="~/images/Nlogo1.jpg" alt="Logo" class="logo-image rounded-circle" style="height: 50px; width: 50px;"></a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Dashboard" asp-action="Home">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        </li>
+                    </ul>
+                    <div>
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <div class="navbar float-end">
+                                <span>Welcome To</span><span class="text-success font-weight-bold p-2">@User.Identity.Name</span><a class="btn btn-sm btn-danger font-weight-bold" asp-action="LogOut" asp-controller="Account">Logout</a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+    
+    <!--<div>-->
+            <!--<img src="~/images/bck.jpg" alt="Common Picture" class="common-picture" />-->
+    <!--</div>-->
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+    
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2023 - TeamManageSystem - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/datatable/jquery.datatables.js"></script>
+    <script src="~/datatable/jquery.datatables.min.js"></script>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

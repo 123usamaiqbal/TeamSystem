@@ -1,0 +1,42 @@
+﻿@{
+    ViewData["Title"] = "FrontPage";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="~/css/FrontPageStyle.css" />
+<style>
+        .button-container-flex .btn {
+            padding: 12px 24px; /* Adjust the padding to increase the button size */
+            font-size: 18px; /* Adjust the font size for larger text */
+            margin-top: 20px;
+        }
+        /* Optionally, add some space between the buttons */
+        .button-container-flex a {
+            margin: 0 5px;
+        }
+
+    .text-center.text-light {
+        font-family: "Algerian", sans-serif; /* Change to the desired font family */
+        font-size: 70px;
+        margin-top:80px; 
+        /* Adjust the font size as needed */
+        /* You can also apply other text properties such as font-weight, text-transform, etc. */
+    }
+    .logo {
+        width: 250px;
+        height: 250px;
+    }
+   
+</style>
+<link rel="stylesheet" href="~/css/animation.css" />
+<h1 class="text-center text-light">WELCOME</h1>
+<div class="text-center">
+    <img src="~/images//Nlogo1.jpg" alt="Logo" class="logo-image rounded-circle logo" />
+</div>
+
+    <div class="button-container-flex text-center">
+    <a asp-action="Login" class="btn btn-light">Login</a>
+    <a asp-action="SignUp" class="btn btn-light">SignUp</a>
+</div>
+

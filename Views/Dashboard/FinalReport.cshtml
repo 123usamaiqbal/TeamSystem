@@ -1,0 +1,92 @@
+﻿@model TeamManageSystem.Models.Account.Report
+@{
+    ViewData["Title"] = "FinalReport";
+    Layout = "~/Views/Shared/_Layout_forDashboard.cshtml";
+}
+<style>
+    body {
+        background-image: url('https://img.freepik.com/free-photo/background_53876-32169.jpg'); /* Replace 'path/to/your/image.jpg' with the path to your image */
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center center;
+    }
+
+    .rounded-button {
+        height: 45px;
+        width: 45px;
+        border-radius: 50%; /* Set border radius to 50% to create a circular button */
+        padding: 10px; /* Add padding for spacing within the circular button */
+    }
+    .custom-btn {
+        background-color: antiquewhite; /* Replace with your desired background color */
+        color: black; /* Replace with your desired text color */
+        /* Add any other custom styling you need */
+    }
+    .table thead th:nth-child(1),
+    .table thead th:nth-child(2),
+    .table thead th:nth-child(3),
+    .table tbody td:nth-child(1),
+    .table tbody td:nth-child(2),
+    .table tbody td:nth-child(3) {
+        width: 120px; /* Adjust the value as needed */
+    }
+
+    .custom-text {
+        font-family: "Arial", sans-serif; /* Change the font family to your desired font */
+        font-weight: bold; /* Change the font weight to "normal" or other values as needed */
+        /*font-style: italic; Change to "normal" for regular text, "italic" for italicized */
+        /*text-decoration: underline; Change to "none" for no underline, "line-through" for strikethrough */
+        letter-spacing: 1px; /* Adjust the letter spacing to your preference */
+        /* Add more styles as needed, e.g., text-transform, text-align, etc. */
+        text-align: center;
+    }
+</style>
+<div style="display: flex; align-items: center; justify-content: space-between;">
+    <a asp-action="ViewTeam" class="btn custom-btn m-2 rounded-button">
+        <i class="fas fa-arrow-left" style="color: black;"></i>
+    </a>
+    <h3 class="text-center" style="color:white; margin: 0; flex-grow: 1;">FINAL PERFORMANCE REVIEW REPORT</h3>
+</div>
+<div class="col-6 offset-3 border rounded p-lg-4" style="background-color:antiquewhite">
+    <h5 class="custom-text">Sprint-Wise Ratings</h5>
+<hr />
+@if (Model.SprintRatingModel != null && Model.SprintRatingModel.Count > 0)
+{
+    <table class="table">
+        <thead>
+                <tr style="background-color: lightcyan">
+            <th>Member Name</th>
+            <th>Sprint Rating</th>
+            <th>Sprint Id</th>
+        </tr>
+            </thead>
+            <tbody>
+        @foreach (var sprintRating in Model.SprintRatingModel)
+        {  
+            <tr>
+                <td>@sprintRating.Mname</td>
+                <td>@sprintRating.SRating</td>
+                        <td>@sprintRating.SprintId</td>
+            </tr>
+                
+        }
+            </tbody>
+    </table>
+}
+else
+{
+    <p>No sprint ratings found for this member.</p>
+}
+
+<!-- Display overall rating -->
+<h1>     </h1>
+<h1>     </h1>
+    <h4 class="custom-text">Overall Performance Summary</h4>
+<hr />
+<p>Member Name: @Model.RatingModel.MemberName</p>
+<p>Rating: @Model.RatingModel.Ratings</p>
+    <h4 class="custom-text">Feedback</h4>
+<hr />
+<p class="text-center">@Model.RatingModel.FeedBack</p>
+</div>
+

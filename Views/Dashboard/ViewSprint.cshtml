@@ -1,0 +1,63 @@
+﻿    @model IEnumerable<TeamManageSystem.Models.Account.Sprint>
+    @{
+        ViewData["Title"] = "ViewSprint";
+        Layout = "~/Views/Shared/_Layout_forDashboard.cshtml";
+    }
+
+    <style>
+        /* Apply flexbox container styles */
+        .flex-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+            /* Optional styling for the <h1> elements */
+            .flex-container h1 {
+                margin: 0;
+            }
+    </style>
+
+    <div class="flex-container">
+        <h1>SPRINTS</h1>
+        <a asp-action="AddSprint" class="btn btn-dark m-2">Add New Sprint</a>
+    </div>
+
+    @foreach (var item in Model)
+    {
+    <div>
+       <hr />
+        <div class="card bg-light mb-3" style="width:30rem" box-shadow="0 4px 8px rgba(0, 0, 0, 0.1)">
+                <div class="card-header" style=" background-color: lightcyan">Sprints</div>
+            <div class="card-body" align="center">
+                <dl class="row">
+                    <dt class="col-sm-4">
+                        @Html.DisplayNameFor(model => model.Title)
+                    </dt>
+                    <dd class="col-sm-8">
+                            @Html.DisplayFor(modelItem => item.Title)
+                    </dd>
+                    <dt class="col-sm-4">
+                        @Html.DisplayNameFor(model => model.SDate)
+                    </dt>
+                    <dd class="col-sm-8">
+                            @Html.DisplayFor(modelItem => item.SDate)
+                    </dd>
+                    <dt class="col-sm-4">
+                        @Html.DisplayNameFor(model => model.EDate)
+                    </dt>
+                    <dd class="col-sm-8">
+                            @Html.DisplayFor(modelItem => item.EDate)
+                    </dd>
+                </dl>
+            </div>
+                <div>
+                    <a asp-action="AddSprintRating" asp-route-id="@item.Id" class="btn btn-dark m-2">Add Sprint Rating</a>
+                    <a asp-action="DeleteConfirmed" asp-route-id="@item.Id" class="btn btn-danger m-2">Delete Sprint</a>
+                    <a asp-action="TDashboard" class="btn btn-info m-2 ">Back</a>
+                </div>
+            
+        </div>
+    </div>
+    }
+    

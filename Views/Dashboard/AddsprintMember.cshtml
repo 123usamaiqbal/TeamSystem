@@ -1,0 +1,81 @@
+﻿@model TeamManageSystem.Models.ViewModel.RemoveMemberViewModel
+@{
+    ViewData["Title"] = "AddsprintMember";
+    Layout = "~/Views/Shared/_Layout_forDashboard.cshtml";
+}
+
+<style>
+    body {
+        background-image: url('https://img.freepik.com/free-photo/background_53876-32169.jpg'); /* Replace 'path/to/your/image.jpg' with the path to your image */
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center center;
+    }
+    .form-container {
+        border: 1px solid #ccc;
+        padding: 20px;
+        max-width: 500px; /* Adjust the width as needed */
+        margin-top: 50px;
+        margin: 0 auto; /* Center the form horizontally */
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        background-color: aliceblue;
+    }
+
+    /* Style the select element */
+    .form-control {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    /* Style the submit button */
+    .btn-danger {
+        background-color: red;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 10px 20px;
+        cursor: pointer;
+        margin-top: 10px;
+        text-align: center;
+    }
+
+    .submit-button-container {
+        margin-top: 10px;
+        text-align: center;
+    }
+</style>
+@if (ViewBag.Message != null)
+{
+    <div class="alert alert-info">
+        @ViewBag.Message
+    </div>
+}
+@if (Model.SprintRating != null)
+{
+    <div class="form-container">
+        <h3>Select a Member:</h3>
+        <form method="post" asp-action="AddsprintMember">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="SprintID" value="@Context.Request.Query["SprintId"]" />
+            <div class="form-group">
+                <!-- Add the 'form-control' class to the select element -->
+                <select name="SelectedMember" id="SelectedMember" class="form-control">
+                    <option value="">Select a member</option>
+                    @foreach (var rating in Model.SprintRating)
+                    {
+                        <option value="@rating.Mname">@rating.Mname</option>
+                    }
+                </select>
+            </div>
+
+            <!-- Add the 'btn-primary' class to the submit button -->
+            <div class="submit-button-container">
+                <button type="submit" class="btn btn-success">Add Member</button>
+            </div>
+        </form>
+    </div>
+}
+

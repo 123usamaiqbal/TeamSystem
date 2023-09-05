@@ -1,0 +1,174 @@
+﻿@model TeamManageSystem.Models.Account.MainSprints
+@{
+    ViewData["Title"] = "_SprintList";
+    Layout = "~/Views/Shared/_Layout_forDashboard.cshtml";
+}
+<style>
+    .flex-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        /* Optional styling for the <h2> elements */
+        .flex-container h2 {
+            margin: 0;
+        }
+
+    .middle-elements {
+        display: flex;
+        align-items: center;
+        flex-grow: 1;
+        flex-basis: 60%;
+        justify-content: space-between;
+        background-color: aliceblue; /* Background color for the bar */
+        padding: 3px; /* Add padding to space the elements from the bar */
+        border-radius: 2px; /* Add border radius for the bar */
+    }
+
+        .middle-elements input[type="date"],
+        .middle-elements a.btn {
+            flex-grow: 1;
+            margin: 0 5px;
+        }
+
+    .flex-container a.btn:last-child {
+        margin-right: 0;
+    }
+
+    .scrollable-container {
+        position: absolute; /* Position the container absolutely */
+        bottom: 0; /* Align to the bottom of the card */
+        right: 0; /* Align to the right of the card */
+        max-height: 135px; /* Set the maximum height for the scrollable container */
+        overflow-y: auto; /* Add a vertical scrollbar if needed */
+        width: 60%; /* Set the desired width for the scrollable container */
+        border: 1px solid #ccc;
+        background-color: aliceblue
+    }
+
+    .sprint-description-box {
+        top: 0;
+        max-height: 120;
+        overflow-y: auto;
+        width: 30%;
+        border: 1px solid #ccc;
+        background-color: aliceblue
+    }
+
+    .rating-container {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+    }
+
+    .column {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #ccc;
+        margin: 0 5px;
+        box-sizing: border-box;
+    }
+
+    ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+        ul li {
+            margin-bottom: 5px;
+        }
+</style>
+<div class="sprints" id="sprintContainer">
+    <!-- Sprint information will be dynamically added here -->
+</div>
+<div><h3>   </h3></div>
+@foreach (var item in Model.Sprints)
+{
+    <div>
+        <div class="card bg-light mb-3 sprint-card" style="width:82rem; height: 11rem;" data-sprint-start="@item.SDate" data-sprint-end="@item.EDate" box-shadow="0 4px 8px rgba(0, 0, 0, 0.1)">
+            <div class="card-header" style="background-color: lightcyan; height:40px ">
+                @Html.DisplayFor(modelItem => item.Title) <dl class="row" style="margin-top:-24px">
+                    <div class="col-sm-2">
+                        <h5>  </h5>
+                    </div>
+                    <div class="col-sm-2">
+                        Sprint No : @Html.DisplayFor(modelItem => item.SprintNo)
+                    </div>
+                    <div class="col-sm-2">
+                        Start Date : @Html.DisplayFor(modelItem => item.SDate)
+                    </div>
+                    <div class="col-sm-2">
+                        End Date : @Html.DisplayFor(modelItem => item.EDate)
+                    </div>
+                    <div class="col-sm-2" style="margin-top: -15px">
+
+                        <a asp-action="AddScores" asp-route-id="@item.Id" data-sprintid="@item.Id" class="btn btn-dark m-2 add-score-button">Manage Scores</a>
+
+                    </div>
+                </dl>
+            </div>
+            <div class="sprint-description-box">
+                <h6>Sprint Description</h6>
+                <p>@Html.DisplayFor(modelItem => item.Discription)</p>
+            </div>
+
+            <div class="card-body" align="center">
+            </div>
+            <div>
+                <a asp-action="AddSprintRating" asp-route-id="@item.Id" class="btn btn-dark m-2">Add Sprint Rating</a>
+                <a asp-action="DeleteConfirmed" asp-route-id="@item.Id" class="btn btn-danger m-2">Delete Sprint</a>
+                <a asp-action="TDashboard" class="btn btn-info m-2 ">Back</a>
+            </div>
+            <div class="scrollable-container">
+                <!-- Team member information goes here -->
+                <!-- You can use a <ul> or <div> to display the team members -->
+                <div class="rating-container">
+                    <div class="column">
+                        <b>Team Members</b>
+                        <ul>
+                            @foreach (var member in Model.TeaMembers)
+                            {
+                                <li>@Html.DisplayFor(memberItem => member.TMname)</li>
+                            }
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <b>Sprint Ratings</b>
+                        <ul>
+                            @foreach (var member in Model.TeaMembers)
+                            {
+                                var sprintRating = Model.SprintRatings?.FirstOrDefault(sr => sr.Mid == member.Id && sr.SprintId == item.Id);
+                                <li>
+                                    @if (sprintRating != null)
+                                    {
+                                        <span>Sprint Rating: @sprintRating.SRating</span>
+                                    }
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <b> Average Sprint Rating </b>
+                        @if (Model.SprintRatings != null && Model.SprintRatings.Any(sr => sr.SprintId == item.Id))
+                        {
+                            var averageSprintRating = Model.SprintRatings.Where(sr => sr.SprintId == item.Id).Average(sr => sr.SRating);
+                            <span>Average Scores : @string.Format("{0:F2}", averageSprintRating)</span>
+                        }
+                        else
+                        {
+                            <span><br>No Average Rating for Sprint</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        var sprintId = @item.Id; // Use the 'sp' variable
+        var ratingsData = @Html.Raw(Json.Serialize(Model.SprintRatings.Where(sr => sr.SprintId == item.Id).ToList()));
+        localStorage.setItem("sprintRatings_" + sprintId, JSON.stringify(ratingsData));
+    </script>
+
+}
+

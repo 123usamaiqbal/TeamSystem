@@ -1,0 +1,126 @@
+﻿@model IEnumerable<TeamManageSystem.Models.Account.User>
+@{
+    ViewData["Title"] = "ViewAllUser";
+    Layout = "~/Views/Shared/_Layout_forDashboard.cshtml";
+}
+<style>
+    .rounded-left-right {
+        border-radius: 25px 25px 25px 25px;
+        width: 130px;
+    }
+    .btn-red{
+        background-color:red;
+        color:white;
+    }
+</style>
+<div class="d-flex justify-content-between align-items-center" style="margin-bottom:20px;">
+    <div>
+        <a asp-action="ADashboard" class="btn custom-btn m-2 rounded-button">
+            <i class="fas fa-arrow-left" style="color:black"></i>
+        </a>
+    </div>
+    <h1 class="text-center" style="color:black;">Team Leaders</h1>
+    <form method="post" asp-action="UpdateRole" class="d-flex justify-content-between align-items-center">
+        <div class="form-group" style="margin-right: 10px;">
+            <input type="text" id="role" name="role" placeholder="User Role" class="form-control custom-input rounded-left-right" style="margin-top:5px;" autocomplete="off" />
+            <span class="text-danger">@TempData["errorUsername"]</span>
+        </div>
+        <div class="form-group" style="margin-right: 10px;">
+            <input list="userNames" name="username" placeholder="Select User" class="form-control custom-input rounded-left-right" autocomplete="off" />
+            <datalist id="userNames">
+                @foreach (var user in Model)
+                {
+                    <option value="@user.Username">@user.Username</option>
+                }
+            </datalist>
+        </div>
+        <div class="form-group">
+            <input type="submit" class="btn custom-btn" value="Update" style="border-radius: 25px 25px 25px 25px;" />
+        </div>
+    </form>
+</div>
+
+
+<style>
+    body {
+        background-image: url('https://img.freepik.com/free-photo/background_53876-32169.jpg'); /* Replace 'path/to/your/image.jpg' with the path to your image */
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center center;
+    }
+    .custom-btn {
+        background-color: antiquewhite; /* Replace with your desired background color */
+        color: black; /* Replace with your desired text color */
+        /* Add any other custom styling you need */
+    }
+    .rounded-button {
+        height: 45px;
+        width: 45px;
+        border-radius: 50%; /* Set border radius to 50% to create a circular button */
+        padding: 10px; /* Add padding for spacing within the circular button */
+    }
+    /* Set a fixed width for the first two columns */
+    .table thead th:nth-child(1),
+    .table thead th:nth-child(2),
+    .table thead th:nth-child(3),
+    .table tbody td:nth-child(1),
+    .table tbody td:nth-child(2),
+    .table tbody td:nth-child(3) {
+        width: 330px; /* Adjust the value as needed */
+    }
+
+    /* Set a percentage width for the third column */
+    .table thead th:nth-child(4)
+    .table tbody td:nth-child(4) {
+        width: 40px; /* Adjust the value as needed */
+    }
+
+</style>
+
+<table class="table" style="border: 1px solid #ccc; background-color: lightcyan" id="dataTableData">
+    <thead>
+        <tr style="background-color: lightcyan">
+            <th>
+                @Html.DisplayNameFor(model => model.Username)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Role)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Email)
+            </th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Username)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Role)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Email)
+                </td>
+                <td>
+                    <form asp-action="DeleteUser" method="post" asp-route-id="@item.Id" class="d-inline">
+                        <button type="submit" class="btn btn-red" onclick="return confirm('Are you sure you want to delete @item.Username?')">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </form>
+                </td>
+                <td>
+                    <a asp-action="NViewUserSprint" asp-route-id="@item.Id" class="btn btn-warning">View Sprints</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@section scripts{
+    <script src="~/js/dataTable_file.js"></script>
+}
+

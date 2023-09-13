@@ -3,7 +3,18 @@
     ViewData["Title"] = "ViewTeam";
     Layout = "~/Views/Shared/_Layout_forDashboard.cshtml";
 }
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#Userdatatable').DataTable({
+            dom: 'lBfrtip',
+            buttons: [
+                'copy', 'csv', 'excel', 'pdf', 'print'
+            ]
 
+        });
+    });
+</script>
 <h1 class="text-center">Team Members</h1>
 <div class="d-flex justify-content-between align-items-center">
     <div>
@@ -36,7 +47,7 @@
     .table tbody td:nth-child(1),
     .table tbody td:nth-child(2),
     .table tbody td:nth-child(3) {
-        width: 350px; /* Adjust the value as needed */
+        width: 400px; /* Adjust the value as needed */
     }
 
     /* Set a percentage width for the third column */
@@ -47,7 +58,7 @@
 
     .table thead th:nth-child(5),
     .table tbody td:nth-child(5) {
-        width: 12%; /* Adjust the value as needed */
+        width: 4%; /* Adjust the value as needed */
     }
     .table thead th:nth-child(6),
     .table tbody td:nth-child(6) {
@@ -71,7 +82,7 @@
     }
 </style>
 
-<table class="table" style="border: 1px solid #ccc; background-color: lightcyan" id="dataTableData">
+<table class="table" style="border: 1px solid #ccc; background-color: lightcyan" id="Userdatatable">
     <thead>
         <tr style="background-color: lightcyan">
             <th>
@@ -106,7 +117,7 @@
                     <a asp-action="AddFeedback" asp-route-id="@item.Id" class="btn btn-outline-primary" title="Feedback"><i class="fas fa-thumbs-up"></i></a>
                 </td>
                 <td>
-                    <a asp-action="ViewRating" asp-route-id="@item.Id" class="btn btn-outline-success">Average Rating</a>
+                    <a asp-action="ViewRating" asp-route-id="@item.Id" class="btn btn-outline-success" title="Average Rating"><i class='fas fa-star'></i></a>
                 </td>
                 <td>
                     <a asp-action="FinalReport" asp-route-id="@item.Id" class="btn btn-outline-dark" title="Final Report"><i class="fas fa-file-alt" ></i></a>
@@ -121,13 +132,11 @@
                         </button>
                     </form>
                 </td>
+               
         </tr>
 }
     </tbody>
 </table>
-@section scripts{
-    <script src="~/js/dataTable_file.js"></script>
-}
 @*<td>*@
 @*<a asp-action="DeleteMember" asp-route-id="@item.Id" class="btn btn-outline-danger" title="Delete"><i class="fas fa-trash-alt"></i></a>*@
 @*</td>*@

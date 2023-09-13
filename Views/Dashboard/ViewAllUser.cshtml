@@ -3,16 +3,18 @@
     ViewData["Title"] = "ViewAllUser";
     Layout = "~/Views/Shared/_Layout_forDashboard.cshtml";
 }
-<style>
-    .rounded-left-right {
-        border-radius: 25px 25px 25px 25px;
-        width: 130px;
-    }
-    .btn-red{
-        background-color:red;
-        color:white;
-    }
-</style>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#Userdatatable').DataTable({
+            dom: 'lBfrtip',
+            buttons:[
+                'copy','csv','excel','pdf','print'
+            ]
+            
+        });
+    });
+</script>
 <div class="d-flex justify-content-between align-items-center" style="margin-bottom:20px;">
     <div>
         <a asp-action="ADashboard" class="btn custom-btn m-2 rounded-button">
@@ -75,9 +77,18 @@
         width: 40px; /* Adjust the value as needed */
     }
 
+    .rounded-left-right {
+        border-radius: 25px 25px 25px 25px;
+        width: 130px;
+    }
+
+    .btn-red {
+        background-color: red;
+        color: white;
+    }
 </style>
 
-<table class="table" style="border: 1px solid #ccc; background-color: lightcyan" id="dataTableData">
+<table class="table" style="border: 1px solid #ccc; background-color: lightcyan" id="Userdatatable">
     <thead>
         <tr style="background-color: lightcyan">
             <th>
@@ -120,7 +131,10 @@
         }
     </tbody>
 </table>
-@section scripts{
-    <script src="~/js/dataTable_file.js"></script>
-}
+@* {
+     extend: 'copy',
+      exportOptions: {
+   columns: [0, 1, 2], // Exclude the last column (index 3)
+  }
+},*@
 

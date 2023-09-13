@@ -20,7 +20,8 @@ namespace TeamManageSystem.Data
         public DbSet<TeamManageSystem.Models.Account.Sprint> Sprint { get; set; } = default!;
         public DbSet<TeamManageSystem.Models.Account.Rating> Rating { get; set; } = default!;
         public DbSet<TeamManageSystem.Models.Account.Task> Task { get; set; } = default!;
-        public DbSet<TeamManageSystem.Models.Account.SprintRating> SprintRating { get; set; } = default!;
+        public DbSet<TeamManageSystem.Models.Account.SprintRating> SprintRating { get; set; } = default!;   
+        public DbSet<TeamManageSystem.Models.Account.ChatMessage> ChatMessages { get; set; } = default!;
 
     }
 }

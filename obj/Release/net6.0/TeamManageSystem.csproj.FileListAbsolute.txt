@@ -284,3 +284,14 @@ C:\Users\USER\source\repos\TeamManageSystem\TeamManageSystem\obj\Release\net6.0\
 C:\Users\USER\source\repos\TeamManageSystem\TeamManageSystem\obj\Release\net6.0\TeamManageSystem.pdb
 C:\Users\USER\source\repos\TeamManageSystem\TeamManageSystem\obj\Release\net6.0\TeamManageSystem.genruntimeconfig.cache
 C:\Users\USER\source\repos\TeamManageSystem\TeamManageSystem\obj\Release\net6.0\ref\TeamManageSystem.dll
+C:\Users\USER\source\repos\TeamManageSystem\TeamManageSystem\bin\Release\net6.0\libman.json
+C:\Users\USER\source\repos\TeamManageSystem\TeamManageSystem\bin\Release\net6.0\Microsoft.AspNetCore.Connections.Abstractions.dll
+C:\Users\USER\source\repos\TeamManageSystem\TeamManageSystem\bin\Release\net6.0\Microsoft.AspNetCore.Http.Connections.Client.dll
+C:\Users\USER\source\repos\TeamManageSystem\TeamManageSystem\bin\Release\net6.0\Microsoft.AspNetCore.Http.Connections.Common.dll
+C:\Users\USER\source\repos\TeamManageSystem\TeamManageSystem\bin\Release\net6.0\Microsoft.AspNetCore.SignalR.Client.dll
+C:\Users\USER\source\repos\TeamManageSystem\TeamManageSystem\bin\Release\net6.0\Microsoft.AspNetCore.SignalR.Client.Core.dll
+C:\Users\USER\source\repos\TeamManageSystem\TeamManageSystem\bin\Release\net6.0\Microsoft.AspNetCore.SignalR.Common.dll
+C:\Users\USER\source\repos\TeamManageSystem\TeamManageSystem\bin\Release\net6.0\Microsoft.AspNetCore.SignalR.Protocols.Json.dll
+C:\Users\USER\source\repos\TeamManageSystem\TeamManageSystem\bin\Release\net6.0\Microsoft.Extensions.Features.dll
+C:\Users\USER\source\repos\TeamManageSystem\TeamManageSystem\bin\Release\net6.0\System.IO.Pipelines.dll
+C:\Users\USER\source\repos\TeamManageSystem\TeamManageSystem\bin\Release\net6.0\System.Threading.Channels.dll

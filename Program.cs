@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using TeamManageSystem.Data;
+using TeamManageSystem.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<TeamManageContext>(options =>
@@ -27,6 +28,7 @@ builder.Services.AddSession(option =>
     option.Cookie.HttpOnly = true;
     option.Cookie.IsEssential = true;
 });
+builder.Services.AddSignalR();
 //builder.Services.AddIdentity<IdentityUser, IdentityRole>()
 //            .AddEntityFrameworkStores<TeamManageContext>()
 //            .AddDefaultTokenProviders();
@@ -51,5 +53,6 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Account}/{action=FrontPage}/{id?}");
+app.MapHub<ChatHub>("/chatHub");
 
 app.Run();

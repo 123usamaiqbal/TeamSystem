@@ -3,6 +3,9 @@
     ViewData["Title"] = "ADashboard";
     Layout = "~/Views/Shared/_Layout_forDashboard.cshtml";
 }
+@{
+    string userName = User.Identity.IsAuthenticated ? User.Identity.Name : ""; // Get the username
+}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-g2iBx9d+AkZ3Q2p9icRtCFz8qiVZ9d0XsxbCPyvB0USQczYHkaQHEGUKG7ed70sW5R8I5P2FkjDljW5A48EpMw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <style>
  /*--------------------------------------------------*/
@@ -96,9 +99,9 @@
     }
 
     .sidebar {
-        margin-top: -20px;
-        margin-left: -210px;
-        width: 280px;
+        margin-top: -2%;
+        margin-left: -16%;
+        width: 25%;
         height: 800px;
         background: linear-gradient(to bottom, lightcyan, antiquewhite);
         padding: 20px;
@@ -164,7 +167,33 @@
             text-decoration: none;
             cursor: pointer;
         }
+
+    .scrollable-box {
+        height: 300px; /* Adjust the height as needed */
+        overflow: auto;
+        margin-top: 20px; /* Add some space below the user profile information */
+        padding: 10px; /* Add padding to the scrollable box */
+        background-color: lightcyan; /* Set background color */
+        border: 1px solid #ddd; /* Add a border for separation */
+        border-radius: 5px; /* Add rounded corners */
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
+    }
+
+    #messagesList {
+        /* Adjust the container styles as needed */
+        max-height: 300px; /* Limit the height and enable scrolling as needed */
+        /*overflow-y: auto; /* Enable vertical scrolling */
+        padding: 10px; /* Add padding for spacing */
+    }
+
+    .message {
+        /* Adjust individual message styles as needed */
+        margin-bottom: 5px; /* Add vertical spacing between messages */
+    }
 </style>
+<script src="_content/Microsoft.AspNetCore.Components.Web.Extensions/signalr.js"></script>
+<script src="~/js/signalr/dist/browser/signalr.js"></script>
+<script src="~/js/chat.js"></script>
 <link rel="stylesheet" href="~/css/animation.css" />
 <div id="id01" class="modal">
     <div class="modal-content" style="background-color:lightcyan">
@@ -189,8 +218,29 @@
             <hr />
             <button class="btn color-btn" onclick="openModal()" title="Edit Profile"><i class="fas fa-edit"></i></button>
         </div>
+        <!-- Scrollable box -->
+        <div class="container" style="background-color:antiquewhite; margin-top:10px;">
+            <div class="row p-1">
+                <div class="col-5"><input type="hidden" id="userInput" value="@userName" /></div>
+            </div>
+            <div class="row p-1">
+                <div class="col-9"><input type="text" class="w-100" id="messageInput" placeholder="Type Here" /></div>
+                <div class="col-3">
+                    <button id="sendButton" type="button" class="btn btn-success">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="scrollable-box">
+                <div class="container">
+                    <div class="row p-1">
+                        <ul id="messagesList"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-<div class="main-content">
+    <div class="main-content">
 <div class="flex-container">
     <a asp-action="ViewAllMembers" class="btn custom-btn" >View All Members</a>
     <div>
@@ -233,7 +283,6 @@
     function openModal() {
         var modal = document.getElementById('id01');
         modal.style.display = 'block';
-
         $.ajax({
             url: '@Url.Action("Profiles", "Dashboard")', // Replace with the actual controller and action
             type: 'GET',
@@ -251,9 +300,7 @@
             }
         });
     }
-
-      setTimeout(showSlides, 2000); // Change image every 2 seconds
-    }function closeModal() {
+    function closeModal() {
         var modal = document.getElementById('id01');
         modal.style.display = 'none';
     }

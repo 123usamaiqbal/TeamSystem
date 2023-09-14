@@ -256,6 +256,49 @@ namespace TeamManageSystem.Controllers.Account
             return View();
         }
 
+        public IActionResult CalculateRating(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var rating = _context.Rating
+                .FirstOrDefault(r => r.MemberId == id);
+            if (rating == null)
+            {
+                var sprintrating =  _context.SprintRating.Where(s => s.Mid == id && s.IsDelete == 0).ToList();
+                var Member = _context.TMembers.Where(m => m.Id == id).FirstOrDefault();
+                string mname = Member.TMname;
+                int sumSRating = sprintrating.Sum(s => s.SRating);
+                int countSRating = sprintrating.Count;
+                if (countSRating == 0)
+                {
+                    return BadRequest("There is no any Sprint Rating for this user! Firstly add Sprint Rating then View Whole Rating");
+                }
+                decimal avr = sumSRating / countSRating;
+                var data = new Rating()
+                {
+                    MemberId = Member.Id,
+                    MemberName = mname,
+                    Ratings = (int)avr,
+                    FeedBack = "",
+                };
+
+                _context.Rating.Add(data);
+                _context.SaveChanges();
+                return View(data);
+            }
+
+            var sprintrate =  _context.SprintRating.Where(s => s.Mid == id && s.IsDelete == 0).ToList();
+            int sumSRate = sprintrate.Sum(s => s.SRating);
+            int countSRate = sprintrate.Count;
+            decimal avrs = sumSRate / countSRate;
+            rating.Ratings = (int)avrs;
+            _context.SaveChanges();
+            return Ok();
+
+        }
+
         [HttpPost]
         [Route("Dashboard/AddScores")]
         [ValidateAntiForgeryToken]
@@ -289,6 +332,7 @@ namespace TeamManageSystem.Controllers.Account
 
 
                 _context.SaveChanges();
+                CalculateRating(member.Id);
             }
             // Redirect to a success page or perform any other necessary action
             return RedirectToAction("ViewSprints", "Dashboard"); // Change to your desired action and controller
@@ -421,7 +465,7 @@ namespace TeamManageSystem.Controllers.Account
 
         }
 
-        public async Task<IActionResult> ViewTeam()
+        public IActionResult ViewTeam()
         {
             try
             {
@@ -433,10 +477,17 @@ namespace TeamManageSystem.Controllers.Account
                 }
                 int userId1;
                 int.TryParse(userId, out userId1);
-                var teamMembers = await _context.TMembers
+                var teamMembers = _context.TMembers
                 .Where(tm => tm.LeadId == userId1)
-                .ToListAsync();
-                return View(teamMembers);
+                .ToList();
+                var MemberIds = _context.TMembers.Where(tm => tm.LeadId == userId1).Select(tm => tm.Id).ToList();
+                var ratings = _context.Rating.Where(r => MemberIds.Contains(r.MemberId)).ToList();
+                var TeamRating = new ViewTeamDetails
+                {
+                    TeamMembers = teamMembers,
+                    Ratings = ratings
+                };
+                return View(TeamRating);
             }
             catch (Exception ex)
             {
@@ -446,55 +497,6 @@ namespace TeamManageSystem.Controllers.Account
             //return _context.TMembers != null ?
             //View(await _context.TMembers.ToListAsync()) :
             //Problem("Entity set 'MVCStudentsContext.Students'  is null.");
-        }
-
-
-        public async Task<IActionResult> ViewRating(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-            var rating = await _context.Rating
-                .FirstOrDefaultAsync(r => r.MemberId == id);
-            if (rating == null)
-            {
-                var sprintrating = await _context.SprintRating.Where(s => s.Mid == id && s.IsDelete == 0).ToListAsync();
-                var Member = await _context.TMembers.Where(m => m.Id == id).FirstOrDefaultAsync();
-                string mname = Member.TMname;
-                int sumSRating = sprintrating.Sum(s => s.SRating);
-                int countSRating = sprintrating.Count;
-                if (countSRating == 0)
-                {
-                    return BadRequest("There is no any Sprint Rating for this user! Firstly add Sprint Rating then View Whole Rating");
-                }
-                decimal avr = sumSRating / countSRating;
-                var data = new Rating()
-                {
-                    MemberId = Member.Id,
-                    MemberName = mname,
-                    Ratings = (int)avr,
-                    FeedBack = "",
-                };
-
-                _context.Rating.Add(data);
-                _context.SaveChanges();
-                return View(data);
-            }
-
-            var sprintrate = await _context.SprintRating.Where(s => s.Mid == id && s.IsDelete == 0).ToListAsync();
-            int sumSRate = sprintrate.Sum(s => s.SRating);
-            int countSRate = sprintrate.Count;
-            decimal avrs = sumSRate / countSRate;
-            rating.Ratings = (int)avrs;
-            _context.SaveChanges();
-            return View(rating);
-
-            //var sprintrating = await _context.SprintRating.Where(s => s.Mid == id).ToListAsync();
-            //int sumSRating = sprintrating.Sum(s => s.SRating);
-            // int countSRating = sprintrating.Count;
-            // decimal avr = sumSRating / countSRating;
-            // rating.Ratings = (int)avr
         }
 
         public IActionResult BonusGenerate(int? id)
@@ -1612,6 +1614,54 @@ namespace TeamManageSystem.Controllers.Account
                 return RedirectToAction("AddScores", new { id = SprintId });
             }
         }
+        /* public async Task<IActionResult> ViewRating(int? id)
+       {
+           if (id == null)
+           {
+               return NotFound();
+           }
+           var rating = await _context.Rating
+               .FirstOrDefaultAsync(r => r.MemberId == id);
+           if (rating == null)
+           {
+               var sprintrating = await _context.SprintRating.Where(s => s.Mid == id && s.IsDelete == 0).ToListAsync();
+               var Member = await _context.TMembers.Where(m => m.Id == id).FirstOrDefaultAsync();
+               string mname = Member.TMname;
+               int sumSRating = sprintrating.Sum(s => s.SRating);
+               int countSRating = sprintrating.Count;
+               if (countSRating == 0)
+               {
+                   return BadRequest("There is no any Sprint Rating for this user! Firstly add Sprint Rating then View Whole Rating");
+               }
+               decimal avr = sumSRating / countSRating;
+               var data = new Rating()
+               {
+                   MemberId = Member.Id,
+                   MemberName = mname,
+                   Ratings = (int)avr,
+                   FeedBack = "",
+               };
+
+               _context.Rating.Add(data);
+               _context.SaveChanges();
+               return View(data);
+           }
+
+           var sprintrate = await _context.SprintRating.Where(s => s.Mid == id && s.IsDelete == 0).ToListAsync();
+           int sumSRate = sprintrate.Sum(s => s.SRating);
+           int countSRate = sprintrate.Count;
+           decimal avrs = sumSRate / countSRate;
+           rating.Ratings = (int)avrs;
+           _context.SaveChanges();
+           return View(rating);
+
+           //var sprintrating = await _context.SprintRating.Where(s => s.Mid == id).ToListAsync();
+           //int sumSRating = sprintrating.Sum(s => s.SRating);
+           // int countSRating = sprintrating.Count;
+           // decimal avr = sumSRating / countSRating;
+           // rating.Ratings = (int)avr
+       }*/
+
         /* public IActionResult GenerateSprintPdf([FromQuery(Name = "membersJson")] string membersJson)
          {
              var model = JsonConvert.DeserializeObject<MainSprints>(membersJson);
@@ -1666,208 +1716,208 @@ namespace TeamManageSystem.Controllers.Account
 
 
 
-        /*  public IActionResult AddTasks(int? id)
+    /*  public IActionResult AddTasks(int? id)
+   {
+       string userId = null;
+       // Get the logged-in user's UserId (replace this with your actual method of getting the UserId)
+       userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+       int userId1;
+       int.TryParse(userId, out userId1);
+
+       // Retrieve the list of members whose LeadId matches the logged-in UserId
+       var assigneeList = _context.TMembers.Where(m => m.LeadId == userId1).Select(m => new { m.Id, m.TMname }).ToList();
+
+       // You can use ViewData or a ViewModel to pass the list to the view
+       ViewData["AssigneeList"] = new SelectList(assigneeList, "Id","TMname"); // Assuming the member model has properties "Id" and "Name"
+
+       return View();
+   }
+
+   [HttpPost]
+   [Route("Dashboard/AddTasks")]
+   [ValidateAntiForgeryToken]
+   public IActionResult AddTasks(Models.Account.Task Model)
+   {
+       try
        {
-           string userId = null;
-           // Get the logged-in user's UserId (replace this with your actual method of getting the UserId)
-           userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-           int userId1;
-           int.TryParse(userId, out userId1);
-
-           // Retrieve the list of members whose LeadId matches the logged-in UserId
-           var assigneeList = _context.TMembers.Where(m => m.LeadId == userId1).Select(m => new { m.Id, m.TMname }).ToList();
-
-           // You can use ViewData or a ViewModel to pass the list to the view
-           ViewData["AssigneeList"] = new SelectList(assigneeList, "Id","TMname"); // Assuming the member model has properties "Id" and "Name"
-
-           return View();
+           int sprintid = int.Parse(Request.Form["Id"]);
+           //int assignid = Model.AssigneeId;
+           var assigned = _context.TMembers.FirstOrDefault(a => a.Id == Model.AssigneeId);
+           string assigname;
+           if (assigned != null)
+           {
+               assigname = assigned.TMname;
+               var tasks = new Task()
+               {
+                   SprintId = sprintid,
+                   Title = Model.Title,
+                   AssigneeName = assigname,
+                   AssigneeId = Model.AssigneeId,
+               };
+               _context.Task.Add(tasks);
+               _context.SaveChanges();
+               return RedirectToAction("ViewSprint", "Dashboard");
+           }
+           return RedirectToAction("ViewSprint", "Dashboard");
+       }
+       catch (Exception ex)
+       {
+           TempData["errorMessage"] = "An error occurred while adding/updating the rating.";
+           return RedirectToAction("ViewSprint", "Dashboard");
        }
 
-       [HttpPost]
-       [Route("Dashboard/AddTasks")]
-       [ValidateAntiForgeryToken]
-       public IActionResult AddTasks(Models.Account.Task Model)
-       {
-           try
-           {
-               int sprintid = int.Parse(Request.Form["Id"]);
-               //int assignid = Model.AssigneeId;
-               var assigned = _context.TMembers.FirstOrDefault(a => a.Id == Model.AssigneeId);
-               string assigname;
-               if (assigned != null)
-               {
-                   assigname = assigned.TMname;
-                   var tasks = new Task()
-                   {
-                       SprintId = sprintid,
-                       Title = Model.Title,
-                       AssigneeName = assigname,
-                       AssigneeId = Model.AssigneeId,
-                   };
-                   _context.Task.Add(tasks);
-                   _context.SaveChanges();
-                   return RedirectToAction("ViewSprint", "Dashboard");
-               }
-               return RedirectToAction("ViewSprint", "Dashboard");
-           }
-           catch (Exception ex)
-           {
-               TempData["errorMessage"] = "An error occurred while adding/updating the rating.";
-               return RedirectToAction("ViewSprint", "Dashboard");
-           }
+
+   }*/
+
+    /*  public async Task<IActionResult> ViewTasks(int? id)
+      {
+          var tasks = await _context.Task.Where(t => t.SprintId == id).ToListAsync();
+         // var member = awai _context .Task.Where(t=)
+          return View(tasks);
+      }*/
+    /*public IActionResult ViewTeam()
+{
+var teamMembers = _context.TMembers.ToList();
+
+return View(teamMembers);
+    }*/
 
 
-       }*/
+    /* public IActionResult AddTaskRating()
+     {
+         return View();
+     }
 
-        /*  public async Task<IActionResult> ViewTasks(int? id)
-          {
-              var tasks = await _context.Task.Where(t => t.SprintId == id).ToListAsync();
-             // var member = awai _context .Task.Where(t=)
-              return View(tasks);
-          }*/
-        /*public IActionResult ViewTeam()
-    {
-    var teamMembers = _context.TMembers.ToList();
+     [HttpPost]
+     [Route("Dashboard/AddTaskRating")]
+     [ValidateAntiForgeryToken]
+     public IActionResult AddTaskRating(Task model)
+     {
 
-    return View(teamMembers);
-        }*/
-
-
-        /* public IActionResult AddTaskRating()
+         int id = int.Parse(Request.Form["Id"]);
+        Task existingRating = _context.Task.FirstOrDefault(r => r.Id == id);
+         if (existingRating != null)
          {
-             return View();
+             // If a rating record already exists, update the existing one
+             existingRating.TaskRate = model.TaskRate;
+
          }
+         _context.SaveChanges();
+         return RedirectToAction("ViewSprint", "Dashboard");
 
-         [HttpPost]
-         [Route("Dashboard/AddTaskRating")]
-         [ValidateAntiForgeryToken]
-         public IActionResult AddTaskRating(Task model)
-         {
+     }*/
+    /* public IActionResult AddRating()
+   {
+       return View(new Rating());
+   }*/
 
-             int id = int.Parse(Request.Form["Id"]);
-            Task existingRating = _context.Task.FirstOrDefault(r => r.Id == id);
-             if (existingRating != null)
-             {
-                 // If a rating record already exists, update the existing one
-                 existingRating.TaskRate = model.TaskRate;
-
-             }
-             _context.SaveChanges();
-             return RedirectToAction("ViewSprint", "Dashboard");
-
-         }*/
-        /* public IActionResult AddRating()
-       {
-           return View(new Rating());
-       }*/
-
-        /*[HttpPost]
-        [Route("Dashboard/AddRating")]
-        [ValidateAntiForgeryToken]
-        public IActionResult AddRating(Rating Model)
+    /*[HttpPost]
+    [Route("Dashboard/AddRating")]
+    [ValidateAntiForgeryToken]
+    public IActionResult AddRating(Rating Model)
+    {
+        try
         {
-            try
-            {
-                int memberId = int.Parse(Request.Form["Id"]);
-                string memberName = Request.Form["TMname"];
+            int memberId = int.Parse(Request.Form["Id"]);
+            string memberName = Request.Form["TMname"];
 
-                Rating existingRating = _context.Rating.FirstOrDefault(r => r.MemberId == memberId);
-                if (existingRating != null)
+            Rating existingRating = _context.Rating.FirstOrDefault(r => r.MemberId == memberId);
+            if (existingRating != null)
+            {
+                // If a rating record already exists, update the existing one
+                existingRating.Ratings = Model.Ratings;
+                existingRating.FeedBack = Model.FeedBack;
+            }
+            else
+            {
+                var data = new Rating()
                 {
-                    // If a rating record already exists, update the existing one
-                    existingRating.Ratings = Model.Ratings;
-                    existingRating.FeedBack = Model.FeedBack;
-                }
-                else
+                    MemberId = memberId,
+                    MemberName = memberName,
+                    Ratings = Model.Ratings,
+                    FeedBack = Model.FeedBack,
+                };
+                _context.Rating.Add(data);
+            }
+            _context.SaveChanges();
+            return RedirectToAction("ViewTeam", "Dashboard");
+        }
+        catch (Exception ex)
+        {
+            TempData["errorMessage"] = "An error occurred while adding/updating the rating.";
+            return RedirectToAction("ViewTeam", "Dashboard");
+        }
+    }*/
+    /*
+      // int memberId = int.Parse(Request.Form["id"]);
+        if (!int.TryParse(Request.Form["id"], out int memberId))
+        {
+            return NotFound(); // Or handle the error appropriately based on your requirements
+        }
+        if (memberId == null)
+        {
+            return NotFound();
+        }
+
+        var rating = await _context.Rating
+            .FirstOrDefaultAsync(r => r.MemberId == memberId);
+        string userId = null;
+        if (User.Identity.IsAuthenticated)
+        {
+
+            userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        }
+        int userId1;
+        int.TryParse(userId, out userId1);
+        if (ModelState.IsValid)
+        {
+            DateTime startDate = model.StartDate;
+            DateTime endDate = model.EndDate;
+
+            var sprints = await _context.Sprint
+            .Where(r => r.SDate >= startDate && r.EDate <= endDate && r.CreatedBy == userId1)
+            .ToListAsync();
+            var sprintIds = sprints.Select(s => s.Id).ToList();
+            if (rating == null)
+            {
+                var sprintrating = await _context.SprintRating.Where(s => s.Mid == memberId && sprintIds.Contains(s.SprintId)).ToListAsync();
+                var Member = await _context.TMembers.Where(m => m.Id == memberId).FirstOrDefaultAsync();
+                string mname = Member.TMname;
+                int sumSRating = sprintrating.Sum(s => s.SRating);
+                int countSRating = sprintrating.Count;
+                if(countSRating==0)
                 {
-                    var data = new Rating()
-                    {
-                        MemberId = memberId,
-                        MemberName = memberName,
-                        Ratings = Model.Ratings,
-                        FeedBack = Model.FeedBack,
-                    };
-                    _context.Rating.Add(data);
+                    return BadRequest("There is no Sprint between this Time period");
                 }
+                decimal avr = sumSRating / countSRating;
+                var data = new Rating()
+                {
+                    MemberId = Member.Id,
+                    MemberName = mname,
+                    Ratings = (int)avr,
+                    FeedBack = "",
+                };
+
+                _context.Rating.Add(data);
                 _context.SaveChanges();
-                return RedirectToAction("ViewTeam", "Dashboard");
-            }
-            catch (Exception ex)
-            {
-                TempData["errorMessage"] = "An error occurred while adding/updating the rating.";
-                return RedirectToAction("ViewTeam", "Dashboard");
-            }
-        }*/
-        /*
-          // int memberId = int.Parse(Request.Form["id"]);
-            if (!int.TryParse(Request.Form["id"], out int memberId))
-            {
-                return NotFound(); // Or handle the error appropriately based on your requirements
-            }
-            if (memberId == null)
-            {
-                return NotFound();
+                return View(data);
             }
 
-            var rating = await _context.Rating
-                .FirstOrDefaultAsync(r => r.MemberId == memberId);
-            string userId = null;
-            if (User.Identity.IsAuthenticated)
+            var sprintrate = await _context.SprintRating.Where(s => s.Mid == memberId && sprintIds.Contains(s.SprintId)).ToListAsync();
+            int sumSRate = sprintrate.Sum(s => s.SRating);
+            int countSRate = sprintrate.Count;
+            if (countSRate == 0)
             {
 
-                userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+               return BadRequest("There is no Sprint between this Time period");
             }
-            int userId1;
-            int.TryParse(userId, out userId1);
-            if (ModelState.IsValid)
-            {
-                DateTime startDate = model.StartDate;
-                DateTime endDate = model.EndDate;
-
-                var sprints = await _context.Sprint
-                .Where(r => r.SDate >= startDate && r.EDate <= endDate && r.CreatedBy == userId1)
-                .ToListAsync();
-                var sprintIds = sprints.Select(s => s.Id).ToList();
-                if (rating == null)
-                {
-                    var sprintrating = await _context.SprintRating.Where(s => s.Mid == memberId && sprintIds.Contains(s.SprintId)).ToListAsync();
-                    var Member = await _context.TMembers.Where(m => m.Id == memberId).FirstOrDefaultAsync();
-                    string mname = Member.TMname;
-                    int sumSRating = sprintrating.Sum(s => s.SRating);
-                    int countSRating = sprintrating.Count;
-                    if(countSRating==0)
-                    {
-                        return BadRequest("There is no Sprint between this Time period");
-                    }
-                    decimal avr = sumSRating / countSRating;
-                    var data = new Rating()
-                    {
-                        MemberId = Member.Id,
-                        MemberName = mname,
-                        Ratings = (int)avr,
-                        FeedBack = "",
-                    };
-
-                    _context.Rating.Add(data);
-                    _context.SaveChanges();
-                    return View(data);
-                }
-
-                var sprintrate = await _context.SprintRating.Where(s => s.Mid == memberId && sprintIds.Contains(s.SprintId)).ToListAsync();
-                int sumSRate = sprintrate.Sum(s => s.SRating);
-                int countSRate = sprintrate.Count;
-                if (countSRate == 0)
-                {
-
-                   return BadRequest("There is no Sprint between this Time period");
-                }
-                decimal avrs = sumSRate / countSRate;
-                rating.Ratings = (int)avrs;
-                _context.SaveChanges();
-                return View(rating);
-            }
-            return NotFound(model);
-         */
+            decimal avrs = sumSRate / countSRate;
+            rating.Ratings = (int)avrs;
+            _context.SaveChanges();
+            return View(rating);
+        }
+        return NotFound(model);
+     */
 }
 

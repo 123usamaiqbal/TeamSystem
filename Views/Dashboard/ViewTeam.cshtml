@@ -1,4 +1,4 @@
-﻿@model IEnumerable<TeamManageSystem.Models.Account.TMembers>
+﻿@model TeamManageSystem.Models.Account.ViewTeamDetails
 @{
     ViewData["Title"] = "ViewTeam";
     Layout = "~/Views/Shared/_Layout_forDashboard.cshtml";
@@ -75,6 +75,11 @@
         width: 5%; /* Adjust the value as needed */
     }
 
+    .table thead th:nth-child(9),
+    .table tbody td:nth-child(9) {
+        width: 5%; /* Adjust the value as needed */
+    }
+
     .custom-btn {
         background-color: antiquewhite; /* Replace with your desired background color */
         color: black; /* Replace with your desired text color */
@@ -86,23 +91,27 @@
     <thead>
         <tr style="background-color: lightcyan">
             <th>
-                @Html.DisplayNameFor(model => model.TMname)
+                Member Name
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Role)
+                Position
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Salary)
+                Salary
+            </th>
+            <th>
+                Rating
             </th>
             <th></th>
             <th></th>
             <th></th>
             <th></th>
             <th></th>
+            
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+@foreach (var item in Model.TeamMembers) {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.TMname)
@@ -114,10 +123,18 @@
                     @Html.DisplayFor(modelItem => item.Salary)
                 </td>
                 <td>
+                    @foreach (var rating in Model.Ratings.Where(r => r.MemberId == item.Id))
+                    {
+                        @Html.DisplayFor(modelItem => rating.Ratings)
+                        <!-- You can also format and style the rating display as needed -->
+                    }
+                </td>
+                <td>
                     <a asp-action="AddFeedback" asp-route-id="@item.Id" class="btn btn-outline-primary" title="Feedback"><i class="fas fa-thumbs-up"></i></a>
                 </td>
                 <td>
-                    <a asp-action="ViewRating" asp-route-id="@item.Id" class="btn btn-outline-success" title="Average Rating"><i class='fas fa-star'></i></a>
+                    <a asp-action="InputFilterRating" class="btn btn-outline-warning" asp-route-id="@item.Id" title="Date Range Average Rating"><i class='fas fa-star'></i></a>
+                    <!--<a asp-action="ViewRating" asp-route-id="" class="btn btn-outline-success" title="Average Rating"><i class='fas fa-star'></i></a>-->
                 </td>
                 <td>
                     <a asp-action="FinalReport" asp-route-id="@item.Id" class="btn btn-outline-dark" title="Final Report"><i class="fas fa-file-alt" ></i></a>

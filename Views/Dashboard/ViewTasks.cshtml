@@ -1,4 +1,4 @@
-﻿@model IEnumerable<TeamManageSystem.Models.Account.Task>
+﻿@model TeamManageSystem.Models.Account.ViewTaskModel
 @{
     ViewData["Title"] = "ViewTasks";
     Layout = "~/Views/Shared/_Layout_forDashboard.cshtml";
@@ -6,63 +6,230 @@
 
 <h3 style="text-align: center;">VIEW TASKS</h3>
 <style>
-    /* Set a fixed width for the first two columns */
-    .table thead th:nth-child(1),
-    .table thead th:nth-child(2),
-    .table thead th:nth-child(3),
-    .table tbody td:nth-child(1),
-    .table tbody td:nth-child(2),
-    .table tbody td:nth-child(3) {
-        width: 330px; /* Adjust the value as needed */
+    body {
+        background-image: url('https://img.freepik.com/free-photo/background_53876-32169.jpg'); /* Replace 'path/to/your/image.jpg' with the path to your image */
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center center;
     }
 
-    .table thead th:nth-child(4),
-    .table tbody td:nth-child(4) {
-        width: 140px;
+    .flex-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
 
-    /* Set a percentage width for the third column */
-    /*.table thead th:nth-child(5),
-    .table tbody td:nth-child(5),
-    .table thead th:nth-child(4),
-    .table tbody td:nth-child(4) {
-        width: 10%;} /* Adjust the value as needed */
-</style>
-
-<table class="table" style="width: 900px; margin: 0 auto;">
-    <thead>
-        <tr style="background-color: darkseagreen">
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.AssigneeName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.TaskRate)
-            </th>
-            <th></th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Title)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.AssigneeName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.TaskRate)
-                </td>
-                <td>
-                    <a asp-action="AddTaskRating" asp-route-id="@item.Id" class="btn btn-outline-dark">Add Rating</a>
-                </td>
-            </tr>
+        /* Optional styling for the <h2> elements */
+        .flex-container h2 {
+            margin: 0;
         }
-    </tbody>
-</table>
 
+    .middle-elements {
+        display: flex;
+        align-items: center;
+        flex-grow: 1;
+        flex-basis: 60%;
+        justify-content: space-between;
+        background-color: aliceblue; /* Background color for the bar */
+        padding: 3px; /* Add padding to space the elements from the bar */
+        border-radius: 2px; /* Add border radius for the bar */
+    }
+
+        .middle-elements input[type="date"],
+        .middle-elements a.btn {
+            flex-grow: 1;
+            margin: 0 5px;
+        }
+
+    .flex-container a.btn:last-child {
+        margin-right: 0;
+    }
+
+    .scrollable-container {
+        position: absolute; /* Position the container absolutely */
+        bottom: 0; /* Align to the bottom of the card */
+        right: 0; /* Align to the right of the card */
+        max-height: 110px; /* Set the maximum height for the scrollable container */
+        overflow-x: auto; /* Add a vertical scrollbar if needed */
+        width: 350px; /* Set the desired width for the scrollable container */
+        border: 1px solid #ccc;
+        background-color: aliceblue
+    }
+
+    .sprint-description-box {
+        overflow-y: auto;
+        width: 30%;
+        border: 1px solid #ccc;
+        background-color: aliceblue
+    }
+
+    .rating-container {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 3px;
+        width: 600px;
+    }
+
+    .column {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #ccc;
+        margin: 0 2px;
+        box-sizing: border-box;
+    }
+
+    ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+        ul li {
+            margin-bottom: 5px;
+        }
+
+    .small-icon {
+        font-size: 0.7rem; /* Adjust this value to control the icon's size */
+    }
+
+    .assignee-list {
+        display: inline-block;
+        padding-left: 0;
+        list-style-type: none;
+    }
+
+    .assignee-circle {
+        width: 30px;
+        height: 30px;
+        background-color: teal; /* You can set different colors for each assignee */
+        border-radius: 50%;
+        text-align: center;
+        line-height: 30px;
+        font-size: 16px;
+        color: white;
+        display: inline-block;
+        margin-right: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+        .assignee-circle:hover {
+            background-color: #2980b9; /* Change color on hover */
+        }
+
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1; /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    }
+
+    /* Modal Content/Box */
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto; /* 15% from the top and centered */
+        padding: 20px;
+        border: 1px solid #888;
+        width: 40%; /* Could be more or less, depending on screen size */
+    }
+
+    /* The Close Button */
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+</style>
+<div id="id01" class="modal">
+    <div class="modal-content" style="background-color:lightcyan">
+        <div class="container">
+            <span onclick="closeModal()"
+                  class="w3-button w3-display-topright" style="cursor:pointer; font-size: 28px; font-weight: bold;">&times;</span>
+            <div id="profilePartialContainer">
+            </div>
+        </div>
+    </div>
+</div>
+@foreach (var item in Model.ClikupTasks)
+{
+        <div class="card bg-light mb-3 sprint-card" style="width:82rem; height: 90px;" box-shadow="0 4px 8px rgba(0, 0, 0, 0.1)">
+        <div class="card-header" style="height:30px; background-color:lightcyan;">
+                @Html.DisplayFor(modelitem => item.name)
+        </div>
+        <div class="card-body" align="center">
+            </div>
+            <div style="margin-top:-25px; margin-left:10px;" >
+                <p>
+                    <strong>Created Date:</strong> @Html.DisplayFor(modelitem => item.date_created)
+                    <strong>Updated Date:</strong> @Html.DisplayFor(modelitem => item.date_updated)
+                <strong>Status:</strong> <span style="background-color: @item.color; padding: 2px 5px; border-radius: 5px; color:white">
+                    @Html.DisplayFor(modelitem => item.statusvalue)
+                </span>
+                    <strong>Type:</strong> @Html.DisplayFor(modelitem => item.type)
+                </p>
+
+            <div class="row">
+                <div class="col-md-8" style="margin-top:-15px;">
+                    <strong> Priority:</strong> @Html.DisplayFor(modelitem => item.priority)
+                </div>
+                <div class="col-md-2" style="margin-top:-35px; ">
+
+                    <ul class="list-unstyled assignee-list">
+                        @foreach (var assignee in Model.Assignees.Where(a => a.taskid == item.id))
+                        {
+                            <li style="display: inline; margin-right: 1px;">
+                                <div class="assignee-circle" title="@assignee.username">
+                                    @assignee.username.Substring(0, 1).ToUpper()
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                </div>
+                <div class="col-md-1" style="margin-top:-44px;">
+                    <button class="btn btn-primary m-2" onclick="openModal('@item.id')" title="Edit Tasks" ><i class="fas fa-edit"></i></button>
+                </div>
+                <div class="col-md-1" style="margin-top:-44px;">
+                    <form asp-controller="Clickup" asp-action="DeleteTask" method="post" asp-route-id="@item.id" class="d-inline">
+                        <button type="submit" class="btn btn-danger m-2" onclick="return confirm('Are you sure you want to delete @item.name Task?')">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            </div>
+        </div>
+}
+<script>
+    function openModal(itemId) {
+        var modal = document.getElementById('id01');
+        modal.style.display = 'block';
+        $.ajax({
+            url: '@Url.Action("NewEditTask", "Dashboard")', // Replace with the actual controller and action
+            type: 'GET',
+            dataType: 'html',
+            data: { id: itemId },
+            success: function (data) {
+                var sprintsDiv = $('#profilePartialContainer');
+
+                // Load the content of the partial view into the sprintsDiv
+                sprintsDiv.html(data);
+                // This function will be executed after the content is loaded
+                console.log('Partial view loaded successfully');
+            },
+            error: function () {
+                alert('Error loading profile partial.');
+            }
+        });
+    }
+
+    function closeModal() {
+        var modal = document.getElementById('id01');
+        modal.style.display = 'none';
+    }
+</script>

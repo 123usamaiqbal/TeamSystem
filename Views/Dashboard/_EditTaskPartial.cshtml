@@ -1,0 +1,52 @@
+﻿@model TeamManageSystem.Models.ViewModel.ClikupTaskViewModel
+<style>
+    .color-btn {
+        background-color: gray;
+        color: white;
+    }
+
+    .edit-button-container {
+        text-align: left;
+        margin-left: 230px; /* Adjust the value as needed */
+    }
+
+    .rounded-left-right {
+        border-radius: 25px 25px 25px 25px;
+    }
+
+    .custom-input {
+        height: 50px; /* Adjust the value to increase or decrease the height */
+    }
+
+    .custom-btn-width {
+        width: 600px; /* Adjust the value to increase or decrease the width */
+    }
+</style>
+<div><h5>  </h5></div>
+<form asp-controller="Clickup" asp-action="UpdateTask" enctype="multipart/form-data" method="post" id="updateTaskForm">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="id" />
+    <div class="form-group">
+        <input asp-for="name" placeholder="Task Name"  class="form-control rounded-left-right custom-input" style="background-color: aliceblue;" />
+        <span asp-validation-for="name" class="text-danger"></span>
+    </div>
+    <div><h5>  </h5></div>
+    <div class="form-group">
+        <input asp-for="description" placeholder="Task Description" class="form-control rounded-left-right custom-input" style="background-color: aliceblue;" />
+        <span asp-validation-for="description" class="text-danger"></span>
+    </div>
+    <div><h5>  </h5></div>
+    <div class="form-group">
+        <input asp-for="statusvalue" placeholder="Task Status" class="form-control rounded-left-right custom-input" style="background-color: aliceblue;" />
+        <span asp-validation-for="statusvalue" class="text-danger"></span>
+    </div>
+    <div><h5>  </h5></div>
+    <div class="form-group">
+        <input asp-for="priority" placeholder="Task Priority" class="form-control rounded-left-right custom-input" style="background-color: aliceblue;" />
+        <span asp-validation-for="priority" class="text-danger"></span>
+    </div>
+    <div><h5>  </h5></div>
+    <div class="form-group">
+        <input id="saveTaskButton" type="submit" value="Save Changes" class="btn btn-primary rounded-left-right custom-input custom-btn-width" />
+    </div>
+</form>

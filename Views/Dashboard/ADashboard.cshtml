@@ -216,7 +216,9 @@
             <hr />
             <div><i class="fas fa-mobile-alt"></i> @Model.usermodel.Mobile</div>
             <hr />
-            <button class="btn color-btn" onclick="openModal()" title="Edit Profile"><i class="fas fa-edit"></i></button>
+            <button class="btn color-btn" onclick="openModal()" title="Edit Profile"><i class="fas fa-edit"></i></button><h2> </h2>
+            <a asp-controller="Clickup" asp-action="GetSpaces" class="btn btn-warning" title="update lits and spaces"><i class="fas fa-list"></i> Update</a>
+            <a asp-controller="Clickup" asp-action="GetTasks" class="btn btn-warning" title="update tasks and assignees" style="margin-left:10px;"><i class="fas fa-tasks"></i> Update</a>
         </div>
         <!-- Scrollable box -->
         <div class="container" style="background-color:antiquewhite; margin-top:10px;">

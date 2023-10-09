@@ -125,6 +125,7 @@
                     </button>
                 </form>
                 <a asp-action="EditSprint" asp-route-id="@item.Id" class="btn btn-primary m-2 add-score-button"><i class="fas fa-edit"></i></a>
+                <a asp-action="ViewTasks" asp-route-id="@item.Id" class="btn btn-info m-2 add-score-button" title="View Tasks"><i class="fas fa-tasks"></i></a>
                 <a asp-action="AddScores" asp-route-id="@item.Id" data-sprintid="@item.Id" class="btn custom-button m-2 add-score-button"><i class="fas fa-cog"></i> Manage</a>
                 Start Date : @Html.DisplayFor(modelItem => item.SDate) <span>   |  </span> End Date : @Html.DisplayFor(modelItem => item.EDate)
             </div>

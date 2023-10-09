@@ -11,7 +11,7 @@
     <WebStackScaffolding_IsReferencingScriptLibrariesSelected>False</WebStackScaffolding_IsReferencingScriptLibrariesSelected>
     <WebStackScaffolding_LayoutPageFile>~/Views/Shared/_Layout_forDashboard.cshtml</WebStackScaffolding_LayoutPageFile>
     <ActiveDebugProfile>TeamManageSystem</ActiveDebugProfile>
-    <NameOfLastUsedPublishProfile>C:\Users\USER\source\repos\TeamManageSystem\TeamManageSystem\Properties\PublishProfiles\FolderProfile5.pubxml</NameOfLastUsedPublishProfile>
+    <NameOfLastUsedPublishProfile>C:\Users\USER\source\repos\TeamManageSystem\TeamManageSystem\Properties\PublishProfiles\IISProfile.pubxml</NameOfLastUsedPublishProfile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DebuggerFlavor>ProjectDebugger</DebuggerFlavor>

@@ -172,6 +172,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGFzaGJvYXJkXF9BbGxTcHJpbnRQYXJ0aWFsLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/USER/source/repos/TeamManageSystem/TeamManageSystem/Views/Dashboard/_EditTaskPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGFzaGJvYXJkXF9FZGl0VGFza1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/USER/source/repos/TeamManageSystem/TeamManageSystem/Views/Dashboard/_PartialForSpecificUser.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGFzaGJvYXJkXF9QYXJ0aWFsRm9yU3BlY2lmaWNVc2VyLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 

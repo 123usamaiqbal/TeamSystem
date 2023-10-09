@@ -25,5 +25,6 @@ namespace TeamManageSystem.Models.Account
         [Required]
         public DateTime EDate { get; set; }
 
+
     }
 }

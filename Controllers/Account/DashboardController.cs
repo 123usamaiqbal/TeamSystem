@@ -12,6 +12,7 @@ using Task = TeamManageSystem.Models.Account.Task;
 using SprintRating = TeamManageSystem.Models.Account.SprintRating;
 using MainSprint = TeamManageSystem.Models.Account.MainSprints;
 using TeamRating = TeamManageSystem.Models.Account.TeamRating;
+using StatusColors = TeamManageSystem.Models.ClickupModels.StatusColors;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using TeamManageSystem.Models.ViewModel;
@@ -28,18 +29,21 @@ using System.Collections.Immutable;
 using PdfSharpCore.Drawing;
 using PdfSharpCore.Pdf;
 using System.Collections.Generic;
+using static Azure.Core.HttpHeader;
+using System.Diagnostics;
 
 namespace TeamManageSystem.Controllers.Account
 {
     [Authorize]
+
     public class DashboardController : Controller
     {
-        //private readonly UserManager<IdentityUser> _userManager;
+        
+        
         private readonly TeamManageContext _context;
         public DashboardController(TeamManageContext context/* , UserManager<IdentityUser> userManager*/)
         {
-
-            _context = context;
+             _context = context;
             // _userManager = userManager;
 
         }
@@ -792,7 +796,7 @@ namespace TeamManageSystem.Controllers.Account
 
         public IActionResult FinalReport(int id)
         {
-            var sprintrating = _context.SprintRating.Where(s => s.Mid == id && s.IsDelete==0).ToList();
+            var sprintrating = _context.SprintRating.Where(s => s.Mid == id && s.IsDelete==0 && s.SRating!=0).ToList();
             if (sprintrating == null)
             {
                 return BadRequest("This Member have no sprint ratings");
@@ -854,9 +858,11 @@ namespace TeamManageSystem.Controllers.Account
             if (member != null)
             {
                 var sprintRatings = _context.SprintRating.Where(sr => sr.Mid == id).ToList();
+                var rating = _context.Rating.Where(r => r.MemberId == id).FirstOrDefault();
 
                 // Remove the related SprintRating records from the context
                 _context.SprintRating.RemoveRange(sprintRatings);
+                _context.Rating.Remove(rating);
                 _context.TMembers.Remove(member);
             }
 
@@ -1614,55 +1620,103 @@ namespace TeamManageSystem.Controllers.Account
                 return RedirectToAction("AddScores", new { id = SprintId });
             }
         }
-        /* public async Task<IActionResult> ViewRating(int? id)
-       {
-           if (id == null)
-           {
-               return NotFound();
-           }
-           var rating = await _context.Rating
-               .FirstOrDefaultAsync(r => r.MemberId == id);
-           if (rating == null)
-           {
-               var sprintrating = await _context.SprintRating.Where(s => s.Mid == id && s.IsDelete == 0).ToListAsync();
-               var Member = await _context.TMembers.Where(m => m.Id == id).FirstOrDefaultAsync();
-               string mname = Member.TMname;
-               int sumSRating = sprintrating.Sum(s => s.SRating);
-               int countSRating = sprintrating.Count;
-               if (countSRating == 0)
-               {
-                   return BadRequest("There is no any Sprint Rating for this user! Firstly add Sprint Rating then View Whole Rating");
-               }
-               decimal avr = sumSRating / countSRating;
-               var data = new Rating()
-               {
-                   MemberId = Member.Id,
-                   MemberName = mname,
-                   Ratings = (int)avr,
-                   FeedBack = "",
-               };
 
-               _context.Rating.Add(data);
-               _context.SaveChanges();
-               return View(data);
-           }
+        public IActionResult ViewTasks(int? id)
+        {
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            string userId = null;
+            var taskdetails = new ViewTaskModel();
+            if (User.Identity.IsAuthenticated)
+            {
 
-           var sprintrate = await _context.SprintRating.Where(s => s.Mid == id && s.IsDelete == 0).ToListAsync();
-           int sumSRate = sprintrate.Sum(s => s.SRating);
-           int countSRate = sprintrate.Count;
-           decimal avrs = sumSRate / countSRate;
-           rating.Ratings = (int)avrs;
-           _context.SaveChanges();
-           return View(rating);
+                userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            }
+            int userId1;
+            int.TryParse(userId, out userId1);
+            var member = _context.TMembers.Where(m => m.LeadId == userId1).ToList();
+            var names = member.Select(m => m.TMname).ToList();
+            var sprint = _context.Sprint.Where(s => s.Id == id).FirstOrDefault();
+            var sprinttask = _context.ClikupTask.Where(t => (t.date_created >= sprint.SDate && t.date_created <= sprint.EDate) || (t.date_updated >= sprint.SDate && t.date_updated <= sprint.EDate)).ToList();
+            var taskids = sprinttask.Select(t => t.id).ToList();
+            var ratings = _context.SprintRating.Where(r => r.SprintId == id && r.IsDelete == 0).ToList();
+            var rates = _context.SprintRating.Where(r => r.SprintId == id && r.IsDelete == 1).ToList();
 
-           //var sprintrating = await _context.SprintRating.Where(s => s.Mid == id).ToListAsync();
-           //int sumSRating = sprintrating.Sum(s => s.SRating);
-           // int countSRating = sprintrating.Count;
-           // decimal avr = sumSRating / countSRating;
-           // rating.Ratings = (int)avr
-       }*/
+            if (ratings.Count == 0 && rates.Count == 0)
+            {
+                var sprintassignee = _context.ClickupTaskAssignee.Where(a => taskids.Contains(a.taskid) && names.Contains(a.username)).ToList();
+                var tasks = sprinttask.Where(task => _context.ClickupTaskAssignee.Any(a => a.taskid == task.id && names.Contains(a.username))).ToList();
+                taskdetails = new ViewTaskModel
+                {
+                    Assignees = sprintassignee,
+                    ClikupTasks = tasks,
+                };
+            }
+            else if (ratings.Count != 0)
+            {
+                var assignee = _context.ClickupTaskAssignee.AsEnumerable().Where(a => ratings.Any(r => r.Mname == a.username)).ToList();
+                //_context.ClickupTaskAssignee.Where(a => ratings.Any(r => r.Mname == a.username)).ToList();
+                //get the tasks wo have the above assignees
+                var tasks = sprinttask.Join(assignee, task => task.id, a => a.taskid, (task, a) => task).ToList();
+                taskdetails = new ViewTaskModel
+                {
+                    Assignees = assignee,
+                    ClikupTasks = tasks,
+                };
+            }
+            else
+            {
+                var memberName = member.Where(member => !rates.Any(r => r.Mid == member.Id)).Select(member => member.TMname).ToList();
+                var assignee = _context.ClickupTaskAssignee.Where(a => memberName.Contains(a.username)).ToList();
+                var tasks = sprinttask.Join(assignee, task => task.id, a => a.taskid, (task, a) => task).ToList();
+                taskdetails = new ViewTaskModel
+                {
+                    Assignees = assignee,
+                    ClikupTasks = tasks,
+                };
+            }
+            stopwatch.Stop();
+            long elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
+            return View(taskdetails);
+        }
 
-        /* public IActionResult GenerateSprintPdf([FromQuery(Name = "membersJson")] string membersJson)
+        public IActionResult NewEditTask(string id)
+        {
+            var task = _context.ClikupTask.Where(t => t.id == id).FirstOrDefault();
+            if (task == null)
+            {
+                return NotFound();
+            }
+            var newtask = new ClikupTaskViewModel
+            {
+                id = task.id,
+                name = task.name,
+                description = task.description,
+                statusvalue = task.statusvalue,
+
+            };
+            return PartialView("_EditTaskPartial", newtask);
+        }
+
+        /* 
+          public IActionResult EditCliclupTask(string id)
+        {
+            var task = _context.ClikupTask.Where(t => t.id == id).FirstOrDefault();
+            if (task == null)
+            {
+                return NotFound();
+            }
+            var newtask = new ClikupTaskViewModel
+            {
+                id = task.id,
+                name = task.name,
+                description = task.description,
+                statusvalue = task.statusvalue,
+
+            };
+            return View(newtask);
+        } 
+          public IActionResult GenerateSprintPdf([FromQuery(Name = "membersJson")] string membersJson)
          {
              var model = JsonConvert.DeserializeObject<MainSprints>(membersJson);
              var document = new PdfDocument();
@@ -1919,5 +1973,132 @@ return View(teamMembers);
         }
         return NotFound(model);
      */
+    /*
+        Stopwatch stopwatch = new Stopwatch();
+
+           // Start the stopwatch
+           stopwatch.Start();
+           // get the logged in user id
+           //note time 
+           string userId = null;
+           var taskdetails = new ViewTaskModel();
+           if (User.Identity.IsAuthenticated)
+           {
+
+               userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+           }
+           int userId1;
+           int.TryParse(userId, out userId1);
+           var members = _context.TMembers.Where(m => m.LeadId == userId1).ToList();
+           var memberNames = members.Select(m => m.TMname).ToList();
+           var assignees = _context.ClickupTaskAssignee.Where(assignee => memberNames.Contains(assignee.username)).ToList();
+           var assigneetasks = assignees.Select(a => a.taskid).ToList();
+           var tasks = _context.ClikupTask.Where(t => assigneetasks.Contains(t.id)).ToList();
+           //get the sprint for specific id
+           var sprint = _context.Sprint.Where(s => s.Id == id).FirstOrDefault();
+           var sprinttask = tasks.Where(t => (t.date_created >= sprint.SDate && t.date_created <= sprint.EDate) || (t.date_updated >= sprint.SDate && t.date_updated <= sprint.EDate)).ToList();
+           var taskids = sprinttask.Select(t => t.id).ToList();
+           var sprintassignee = assignees.Where(a => taskids.Contains(a.taskid)).ToList();
+           var rating = _context.SprintRating.Where(r => r.SprintId == id).ToList();
+           var ratings = _context.SprintRating.Where(r => r.SprintId == id && r.IsDelete == 0).ToList();
+           var rates = _context.SprintRating.Where(r => r.SprintId == id && r.IsDelete == 1).ToList();
+
+           if (rating.Count == 0 || (ratings.Count == 0 && rates.Count != 0))
+           {
+               taskdetails = new ViewTaskModel
+               {
+                   Assignees = sprintassignee,
+                   ClikupTasks = sprinttask,
+               };
+
+           }
+           else if (ratings.Count != 0)
+           {
+               var names = rating.Select(r => r.Mname).ToList();
+               var assignee = _context.ClickupTaskAssignee.Where(a => names.Contains(a.username)).ToList();
+               var assigneetask = assignee.Select(a => a.taskid).ToList();
+               var task = _context.ClikupTask.Where(t => assigneetask.Contains(t.id)).ToList();
+               var sprinttasks = task.Where(t => (t.date_created >= sprint.SDate && t.date_created <= sprint.EDate) || (t.date_updated >= sprint.SDate && t.date_updated < sprint.EDate)).ToList();
+               var taskid = sprinttask.Select(t => t.id).ToList();
+               var sprintassignees = assignees.Where(a => taskids.Contains(a.taskid)).ToList();
+               taskdetails = new ViewTaskModel
+               {
+                   Assignees = sprintassignees,
+                   ClikupTasks = sprinttasks,
+               };
+
+           }
+           else
+           {
+               var memberName = members.Where(member => !rating.Any(r => r.Mid == member.Id)).Select(member => member.TMname).ToList();
+               var assignee = _context.ClickupTaskAssignee.Where(a => memberName.Contains(a.username)).ToList();
+               var assigneetask = assignee.Select(a => a.taskid).ToList();
+               var task = _context.ClikupTask.Where(t => assigneetask.Contains(t.id)).ToList();
+               var sprinttasks = task.Where(t => (t.date_created >= sprint.SDate && t.date_created <= sprint.EDate) || (t.date_updated >= sprint.SDate && t.date_updated < sprint.EDate)).ToList();
+               var taskid = sprinttask.Select(t => t.id).ToList();
+               var sprintassignees = assignees.Where(a => taskids.Contains(a.taskid)).ToList();
+               taskdetails = new ViewTaskModel
+               {
+                   Assignees = sprintassignees,
+                   ClikupTasks = sprinttasks,
+               };
+
+           }
+
+           // var member = awai _context .Task.Where(t=)
+           stopwatch.Stop();
+           long elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
+
+           // Log or display the elapsed time (for debugging purposes)
+           Console.WriteLine($"ViewTasks method executed in {elapsedMilliseconds} milliseconds");
+           return View(taskdetails);
+       public async Task<IActionResult> ViewRating(int? id)
+      {
+          if (id == null)
+          {
+              return NotFound();
+          }
+          var rating = await _context.Rating
+              .FirstOrDefaultAsync(r => r.MemberId == id);
+          if (rating == null)
+          {
+              var sprintrating = await _context.SprintRating.Where(s => s.Mid == id && s.IsDelete == 0).ToListAsync();
+              var Member = await _context.TMembers.Where(m => m.Id == id).FirstOrDefaultAsync();
+              string mname = Member.TMname;
+              int sumSRating = sprintrating.Sum(s => s.SRating);
+              int countSRating = sprintrating.Count;
+              if (countSRating == 0)
+              {
+                  return BadRequest("There is no any Sprint Rating for this user! Firstly add Sprint Rating then View Whole Rating");
+              }
+              decimal avr = sumSRating / countSRating;
+              var data = new Rating()
+              {
+                  MemberId = Member.Id,
+                  MemberName = mname,
+                  Ratings = (int)avr,
+                  FeedBack = "",
+              };
+
+              _context.Rating.Add(data);
+              _context.SaveChanges();
+              return View(data);
+          }
+
+          var sprintrate = await _context.SprintRating.Where(s => s.Mid == id && s.IsDelete == 0).ToListAsync();
+          int sumSRate = sprintrate.Sum(s => s.SRating);
+          int countSRate = sprintrate.Count;
+          decimal avrs = sumSRate / countSRate;
+          rating.Ratings = (int)avrs;
+          _context.SaveChanges();
+          return View(rating);
+
+          //var sprintrating = await _context.SprintRating.Where(s => s.Mid == id).ToListAsync();
+          //int sumSRating = sprintrating.Sum(s => s.SRating);
+          // int countSRating = sprintrating.Count;
+          // decimal avr = sumSRating / countSRating;
+          // rating.Ratings = (int)avr
+      }*/
+
 }
 

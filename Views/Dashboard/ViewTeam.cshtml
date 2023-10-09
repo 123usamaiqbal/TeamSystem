@@ -1,0 +1,176 @@
+﻿@model TeamManageSystem.Models.Account.ViewTeamDetails
+@{
+    ViewData["Title"] = "ViewTeam";
+    Layout = "~/Views/Shared/_Layout_forDashboard.cshtml";
+}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#Userdatatable').DataTable({
+            dom: 'lBfrtip',
+            buttons: [
+                'copy', 'csv', 'excel', 'pdf', 'print'
+            ]
+
+        });
+    });
+</script>
+<h1 class="text-center">Team Members</h1>
+<div class="d-flex justify-content-between align-items-center">
+    <div>
+        <a asp-action="TDashboard" class="btn custom-btn m-2 rounded-button">
+            <i class="fas fa-arrow-left" style="color:black"></i>
+        </a>
+    </div>
+    <div>
+        <a asp-action="AddMember" class="btn btn-warning">Add New Member</a>
+    </div>
+</div>
+
+<style>
+    body {
+        background-image: url('https://img.freepik.com/free-photo/background_53876-32169.jpg'); /* Replace 'path/to/your/image.jpg' with the path to your image */
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center center;
+    }
+    .rounded-button {
+        height: 45px;
+        width: 45px;
+        border-radius: 50%; /* Set border radius to 50% to create a circular button */
+        padding: 10px; /* Add padding for spacing within the circular button */
+    }
+    /* Set a fixed width for the first two columns */
+    .table thead th:nth-child(1),
+    .table thead th:nth-child(2),
+    .table thead th:nth-child(3),
+    .table tbody td:nth-child(1),
+    .table tbody td:nth-child(2),
+    .table tbody td:nth-child(3) {
+        width: 400px; /* Adjust the value as needed */
+    }
+
+    /* Set a percentage width for the third column */
+    .table thead th:nth-child(4)
+    .table tbody td:nth-child(4) {
+        width: 12%; /* Adjust the value as needed */
+    }
+
+    .table thead th:nth-child(5),
+    .table tbody td:nth-child(5) {
+        width: 4%; /* Adjust the value as needed */
+    }
+    .table thead th:nth-child(6),
+    .table tbody td:nth-child(6) {
+        width: 4%; /* Adjust the value as needed */
+    }
+
+    .table thead th:nth-child(7),
+    .table tbody td:nth-child(7) {
+        width: 3%; /* Adjust the value as needed */
+    }
+
+    .table thead th:nth-child(8),
+    .table tbody td:nth-child(8) {
+        width: 5%; /* Adjust the value as needed */
+    }
+
+    .table thead th:nth-child(9),
+    .table tbody td:nth-child(9) {
+        width: 5%; /* Adjust the value as needed */
+    }
+
+    .custom-btn {
+        background-color: antiquewhite; /* Replace with your desired background color */
+        color: black; /* Replace with your desired text color */
+        /* Add any other custom styling you need */
+    }
+</style>
+
+<table class="table" style="border: 1px solid #ccc; background-color: lightcyan" id="Userdatatable">
+    <thead>
+        <tr style="background-color: lightcyan">
+            <th>
+                Member Name
+            </th>
+            <th>
+                Position
+            </th>
+            <th>
+                Salary
+            </th>
+            <th>
+                Rating
+            </th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.TeamMembers) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.TMname)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Role)
+            </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Salary)
+                </td>
+                <td>
+                    @foreach (var rating in Model.Ratings.Where(r => r.MemberId == item.Id))
+                    {
+                        @Html.DisplayFor(modelItem => rating.Ratings)
+                        <!-- You can also format and style the rating display as needed -->
+                    }
+                </td>
+                <td>
+                    <a asp-action="AddFeedback" asp-route-id="@item.Id" class="btn btn-outline-primary" title="Feedback"><i class="fas fa-thumbs-up"></i></a>
+                </td>
+                <td>
+                    <a asp-action="InputFilterRating" class="btn btn-outline-warning" asp-route-id="@item.Id" title="Date Range Average Rating"><i class='fas fa-star'></i></a>
+                    <!--<a asp-action="ViewRating" asp-route-id="" class="btn btn-outline-success" title="Average Rating"><i class='fas fa-star'></i></a>-->
+                </td>
+                <td>
+                    <a asp-action="FinalReport" asp-route-id="@item.Id" class="btn btn-outline-dark" title="Final Report"><i class="fas fa-file-alt" ></i></a>
+                </td>
+                <td>
+                    <a asp-action="EditMembers" asp-route-id="@item.Id" class="btn btn-outline-info" title="Edit Details"><i class="fas fa-edit"></i></a>
+                </td>
+                <td>
+                    <form asp-action="DeleteM" method="post" asp-route-id="@item.Id" class="d-inline">
+                        <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to delete @item.TMname ?')">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </form>
+                </td>
+               
+        </tr>
+}
+    </tbody>
+</table>
+@*<td>*@
+@*<a asp-action="DeleteMember" asp-route-id="@item.Id" class="btn btn-outline-danger" title="Delete"><i class="fas fa-trash-alt"></i></a>*@
+@*</td>*@
+@*<td>*@
+@*<a asp-action="AddRating" asp-route-id="@item.Id" asp-route-name="@item.TMname" class="btn btn-outline-dark">Add Rating</a>darkseagreen*@
+@*</td>*@
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,37 @@
+﻿@model TeamManageSystem.Models.Account.TMembers
+@{
+    ViewData["Title"] = "SpecificRating";
+    Layout = "~/Views/Shared/_Layout_forDashboard.cshtml";
+}
+@{
+    // Retrieve values from ViewBag
+    DateTime startDate = (DateTime)ViewBag.StartDate;
+    DateTime endDate = (DateTime)ViewBag.EndDate;
+}
+<style>
+    body {
+        background-image: url('https://img.freepik.com/free-photo/background_53876-32169.jpg'); /* Replace 'path/to/your/image.jpg' with the path to your image */
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center center;
+    }
+    </style>
+
+<div>
+    <h4 class="text-center">Specific Average Rating</h4>
+    <hr />
+    <div class="card bg-light mb-3" style="width:30rem;">
+        <div class="card-header" >Average Rating</div>
+        <div class="card-body" align="center">
+            <dl class="row">
+                <p><strong>Member Name:</strong> @Model.TMname</p>
+                <p><strong>Rating:</strong> @ViewBag.BonusRating</p>
+                <p>From  @startDate.ToString("dd-MM-yyyy") To  @endDate.ToString("dd-MM-yyyy")</p>
+            </dl>
+        </div>
+    </div>
+</div>
+<div>
+    <a asp-action="ViewTeam" class="btn btn-info">Back to List</a>
+</div>
+

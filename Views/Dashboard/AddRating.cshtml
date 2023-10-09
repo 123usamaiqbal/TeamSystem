@@ -1,0 +1,49 @@
+﻿@model TeamManageSystem.Models.Account.Rating
+@{
+    ViewData["Title"] = "AddRating";
+    Layout = "~/Views/Shared/_Layout_forDashboard.cshtml";
+}
+
+<h3>AddRating</h3>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="AddRating" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="Id" value="@Context.Request.Query["id"]" />
+            <input type="hidden" name="TMname" value="@Context.Request.Query["name"]" />
+            <label asp-for="Ratings" class="control-label">Ratings</label>
+            <div class="btn-group" data-toggle="buttons">
+                <label class="btn btn-secondary">
+                    <input type="radio" name="Ratings" value="1"> Poor
+                </label>
+                <label class="btn btn-secondary">
+                    <input type="radio" name="Ratings" value="2"> Average
+                </label>
+                <label class="btn btn-secondary">
+                    <input type="radio" name="Ratings" value="3"> Good
+                </label>
+                <label class="btn btn-secondary">
+                    <input type="radio" name="Ratings" value="4"> V_Good
+                </label>
+                <label class="btn btn-secondary">
+                    <input type="radio" name="Ratings" value="5"> Excellent
+                </label>
+                <!-- Add more options as needed -->
+            </div>
+            <div class="form-group">
+                <label asp-for="FeedBack" class="control-label">FeedBack</label>
+                <input asp-for="FeedBack" class="form-control" style="background-color: aliceblue;" />
+            </div>
+
+            <div>
+                <h6>   </h6>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="ADD" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+

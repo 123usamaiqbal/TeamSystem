@@ -1,0 +1,65 @@
+﻿@model TeamManageSystem.Models.Account.Sprint
+@{
+    ViewData["Title"] = "AddSprint";
+    Layout = "~/Views/Shared/_Layout_forDashboard.cshtml";
+}
+
+<style>
+    body {
+        background-image: url('https://img.freepik.com/free-photo/background_53876-32169.jpg'); /* Replace 'path/to/your/image.jpg' with the path to your image */
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center center;
+    }
+
+   
+
+    .rounded-button {
+        height:45px;
+        width: 45px;
+        border-radius: 50%; /* Set border radius to 50% to create a circular button */
+        padding: 10px; /* Add padding for spacing within the circular button */
+    }
+</style>
+<div style="text-align: left;">
+    <a asp-action="ViewSprints" class="btn btn-light m-2 rounded-button">
+        <i class="fas fa-arrow-left" style="color:black"></i>
+    </a>
+</div>
+<div class="container">
+    <div class="row mt-lg-5">
+        <div class="col-4 offset-4 border rounded p-lg-4" style="background-color: lightcyan; margin-top: -15px;">
+            <div class="text-center">
+                <h1 class="text-info">Create New Sprint</h1>
+            </div>
+            <form method="post" asp-action="AddSprint">
+                <div><h5>  </h5></div>
+                <div class="form-group">
+                    <label asp-for="Title"></label>
+                    <input type="text" asp-for="Title" placeholder="Enter sprint title" class="form-control" autocomplete="off" />
+                </div>
+                <div><h5>  </h5></div>
+                <div class="form-group">
+                    <label asp-for="SDate"></label>
+                    <input type="date" asp-for="SDate" placeholder="Enter start date" class="form-control" autocomplete="off" />
+                </div>
+                <div><h5>  </h5></div>
+                <div class="form-group">
+                    <label asp-for="EDate"></label>
+                    <input type="date" asp-for="EDate" placeholder="Enter end date" class="form-control" autocomplete="off" />
+                </div>
+                <div><h5>  </h5></div>
+                <div class="form-group">
+                    <label asp-for="Discription"></label>
+                    <input type="text" asp-for="Discription" placeholder="Enter sprint discription" class="form-control" autocomplete="off" />
+                </div>
+                <div><h2>  </h2></div>
+                <div class="form-group">
+                    <input type="submit" class="btn btn-primary float-lg-end" value="CREATE" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@*style="background-color: lavenderblush"*@
+

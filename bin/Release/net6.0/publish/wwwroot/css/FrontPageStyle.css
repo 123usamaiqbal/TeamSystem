@@ -1,0 +1,25 @@
+﻿@media (max-width: 768px) {
+    /* Adjust styles for smaller screens */
+    .text-center.text-light {
+        font-family: "Algerian", sans-serif;
+        font-size: 30px; /* Adjust font size for smaller screens */
+        margin-top: 40px; /* Adjust the margin for better spacing */
+    }
+
+    .logo-image {
+        height: 150px; /* Adjust image height for smaller screens */
+        width: 150px; /* Adjust image width for smaller screens */
+    }
+
+    .button-container-flex .btn {
+        padding: 8px 16px; /* Adjust button padding for smaller screens */
+        font-size: 16px; /* Adjust button font size for smaller screens */
+        margin-top: 15px; /* Adjust button margin for better spacing */
+    }
+    .logo {
+        width: 130px;
+        height: 130px;
+    }
+
+    /* Adjust other styles as needed */
+}

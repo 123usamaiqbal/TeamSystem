@@ -1,0 +1,42 @@
+﻿@media (max-width: 768px) {
+    /* Adjust styles for smaller screens */
+    .dashboard-container {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        margin-top: 0;
+        margin-left: 0;
+        width: 100%;
+        padding: 10px;
+    }
+
+    .main-content {
+        padding: 10px;
+    }
+
+    .cards-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .card {
+        width: 80%;
+        margin: 15px auto;
+    }
+
+        /* Adjust font sizes for better readability on smaller screens */
+        .card h4 {
+            font-size: 16px;
+        }
+
+        .card p {
+            font-size: 14px;
+        }
+
+    /* Adjust modal styles */
+    .modal-content {
+        width: 80%;
+        margin: 30% auto;
+    }
+}

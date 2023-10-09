@@ -1,0 +1,63 @@
+﻿@model TeamManageSystem.Models.Account.TMembers
+@{
+    ViewData["Title"] = "AddMemeber";
+    Layout = "~/Views/Shared/_Layout_forDashboard.cshtml";
+}
+
+<style>
+    body {
+        background-image: url('https://img.freepik.com/free-photo/background_53876-32169.jpg'); /* Replace 'path/to/your/image.jpg' with the path to your image */
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center center;
+    }
+    /*body { background-image: url('path/to/your/image.jpg'); /* Replace 'path/to/your/image.jpg' with the actual image file path */ /*background-size: cover;*/ /* Adjust how the background image is displayed */  /* background-repeat: no-repeat;} */
+    .rounded-button {
+        height: 45px;
+        width: 45px;
+        border-radius: 50%; /* Set border radius to 50% to create a circular button */
+        padding: 10px; /* Add padding for spacing within the circular button */
+    }
+
+    .custom-btn {
+        background-color: antiquewhite; /* Replace with your desired background color */
+        color: black; /* Replace with your desired text color */
+        /* Add any other custom styling you need */
+    }
+</style>
+<div style="text-align: left;">
+    <a asp-action="ViewTeam" class="btn custom-btn m-2 rounded-button">
+        <i class="fas fa-arrow-left" style="color:black"></i>
+    </a>
+</div>
+<div class="container">
+    <div class="row mt-lg-5">
+        <div class="col-4 offset-4 border rounded p-lg-4" style="background-color: lightcyan; margin-top: -30px;">
+            <div class="text-center">
+                <h1 class="text-info">Add Team Member</h1>
+            </div>
+            <form method="post" asp-action="AddMember">
+                <div class="form-group">
+                    <label asp-for="TMname"></label>
+                    <input type="text" asp-for="TMname" placeholder="Enter username" class="form-control" autocomplete="off" />
+                </div>
+                <div><h5>  </h5></div>
+                <div class="form-group">
+                    <label asp-for="Role"></label>
+                    <input type="text" asp-for="Role" placeholder="Enter designation" class="form-control" autocomplete="off" />
+                </div>
+                <div><h5>  </h5></div>
+                <div class="form-group">
+                    <label asp-for="Salary"></label>
+                    <input type="text" asp-for="Salary" placeholder="Enter salary" class="form-control" autocomplete="off" />
+                </div>
+                <div><h2>  </h2></div>
+                <div class="form-group">
+                    <input type="submit" class="btn btn-primary float-lg-end" value="ADD" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@*style="background-color: lavenderblush"*@
+

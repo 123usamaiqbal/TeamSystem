@@ -1,0 +1,69 @@
+﻿@model TeamManageSystem.Models.ViewModel.SignUpUserViewModel
+@{
+    ViewData["Title"] = "SignUp";
+}
+
+<style>
+    .rounded-left-right {
+        border-radius: 25px 25px 25px 25px;
+    }
+
+    .custom-input {
+        height: 35%; /* Adjust the value to increase or decrease the height */
+    }
+
+    .custom-btn-width {
+        width: 100%; /* Adjust the value to increase or decrease the width */
+    }
+</style>
+<link rel="stylesheet" href="~/css/animation.css" />
+<div class="container">
+    <div class="row">
+        <div class="col-6 offset-3 border  rounded p-lg-4" style="background-color: lightcyan; margin-top: 30px">
+            <div class="text-center">
+                <h2 style="color:black;"> Registration </h2>
+            </div>
+            <h3 class="text-danger text-center">@TempData["errorMessage"]</h3>
+            <form method="post" asp-action="SignUp">
+                <div class="form-group">
+                    <input type="text" asp-for="Username" placeholder="Enter username" class="form-control rounded-left-right custom-input" autocomplete="off" style="margin-top:3%;" />
+                     <span asp-validation-for="Username" class="text-danger"></span>
+                </div>
+                <div><h5>  </h5></div>
+                <div class="form-group">
+                    <input type="text" asp-for="Email" placeholder="Enter email" class="form-control rounded-left-right custom-input" autocomplete="off" style="margin-top:3%;" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+                <div><h5>  </h5></div>
+                <div class="form-group">
+                    <input type="text" asp-for="Mobile" placeholder="Enter mobile number" class="form-control rounded-left-right custom-input" autocomplete="off" style="margin-top:3%;" />
+                    <span asp-validation-for="Mobile" class="text-danger"></span>
+                </div>
+                <div><h5>  </h5></div>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-group">
+                            <input type="password" asp-for="Password" placeholder="Enter password" class="form-control rounded-left-right custom-input" autocomplete="off" style="margin-top:3%;" />
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-group">
+                            <input type="password" asp-for="ConfirmPassword" placeholder="Enter confirm password" class="form-control rounded-left-right custom-input" autocomplete="off" style="margin-top:3%;" />
+                            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            <div><h5>  </h5></div>
+                <div class="form-group text-center custom-btn-width">
+                    <input type="submit" class="btn btn-info rounded-left-right custom-input custom-btn-width" style="margin-top:3%;" value="Sign Up" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@*<script src="~/lib/jquery/dist/jquery.js"></script>*@
+@*<script src="~/lib/jquery/dist/jquery.min.js"></script>*@
+@*<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>*@
+@*<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>*@
+

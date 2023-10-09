@@ -1,0 +1,58 @@
+﻿
+@{
+    ViewData["Title"] = "Home";
+    Layout = "~/Views/Shared/_Layout_forDashboard.cshtml";
+}
+<style>
+    body {
+        background-image: url('https://img.freepik.com/free-photo/background_53876-32169.jpg'); /* Replace 'path/to/your/image.jpg' with the path to your image */
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center center;
+    }
+
+    .rounded-button {
+        height: 45px;
+        width: 45px;
+        border-radius: 50%; /* Set border radius to 50% to create a circular button */
+        padding: 10px; /* Add padding for spacing within the circular button */
+    }
+
+    .custom-btn {
+        background-color: antiquewhite; /* Replace with your desired background color */
+        color: black; /* Replace with your desired text color */
+        /* Add any other custom styling you need */
+    }
+</style>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="text-center mt-5">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <a asp-action="TDashboard" class="btn custom-btn m-2 rounded-button">
+                            <i class="fas fa-arrow-left" style="color:black"></i>
+                        </a>
+                    </div>
+                    <div>
+                        <h1>Welcome to Team Performance Management System</h1>
+                    </div>
+                </div>
+                
+                <p class="lead">
+                    Team Performance Management is a powerful application that empowers team leaders to effectively manage and monitor team performance. With our platform, you can easily create sprints for every week, allowing you to track and evaluate your team's progress and achievements.
+                </p>
+                <p>
+                    Each sprint provides a comprehensive overview of your team's accomplishments, enabling you to rate team members based on their performance. Our intuitive interface makes it simple to assign ratings and provide valuable feedback, ensuring that your team is always on the path to success.
+                </p>
+                <p>
+                    As a team leader, you have the ability to view average ratings for each team member, aiding you in identifying top performers and areas for improvement. Additionally, our platform facilitates the creation of bonuses for team members with exceptional ratings, motivating your team to strive for excellence.
+                </p>
+                <p>
+                    Join us today and experience the power of Team Performance Management System in driving your team's success to new heights!
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+

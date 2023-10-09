@@ -1,0 +1,65 @@
+﻿@model TeamManageSystem.Models.Account.TMembers
+@{
+    ViewData["Title"] = "DeleteMember";
+    Layout = "~/Views/Shared/_Layout_forDashboard.cshtml";
+}
+<style>
+    body {
+        background-image: url('https://img.freepik.com/free-photo/background_53876-32169.jpg'); /* Replace 'path/to/your/image.jpg' with the path to your image */
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center center;
+    }
+
+    .rounded-button {
+        height: 45px;
+        width: 45px;
+        border-radius: 50%; /* Set border radius to 50% to create a circular button */
+        padding: 10px; /* Add padding for spacing within the circular button */
+    }
+
+    .custom-btn {
+        background-color: antiquewhite; /* Replace with your desired background color */
+        color: black; /* Replace with your desired text color */
+        /* Add any other custom styling you need */
+    }
+</style>
+
+<div style="display: flex; align-items: center; justify-content: space-between;">
+    <a asp-action="ViewTeam" class="btn custom-btn m-2 rounded-button">
+        <i class="fas fa-arrow-left" style="color: black;"></i>
+    </a>
+    <h4 class="text-center" style="color:white; margin: 0; flex-grow: 1;">Are you sure you want to delete!</h4>
+</div>
+<div>
+    <hr />
+    <dl class="row">
+        <div class="col-4 border rounded p-lg-4" style="background-color:lightcyan">
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.TMname)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.TMname)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Role)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Role)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Salary)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Salary)
+        </dd>
+        </div>
+    </dl>
+
+    <form asp-action="DeleteM">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Delete Confirmed" class="btn btn-danger" />
+        <!--<a asp-action="Index">Back to List</a>-->
+    </form>
+</div>
+

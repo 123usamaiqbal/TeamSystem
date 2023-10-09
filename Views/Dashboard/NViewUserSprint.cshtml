@@ -1,0 +1,214 @@
+﻿@{
+    ViewData["Title"] = "NViewUserSprint";
+    Layout = "~/Views/Shared/_Layout_forDashboard.cshtml";
+}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<style>
+    body {
+        background-image: url('https://img.freepik.com/free-photo/background_53876-32169.jpg'); /* Replace 'path/to/your/image.jpg' with the path to your image */
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center center;
+    }
+    /* Apply flexbox container styles */
+    .flex-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        /* Optional styling for the <h2> elements */
+        .flex-container h2 {
+            margin: 0;
+        }
+
+    .middle-elements {
+        display: flex;
+        align-items: center;
+        flex-grow: 1;
+        flex-basis: 60%;
+        justify-content: space-between; /* Background color for the bar */
+        padding: 3px; /* Add padding to space the elements from the bar */
+        border-radius: 2px; /* Add border radius for the bar */
+    }
+
+        .middle-elements input[type="date"],
+        .middle-elements a.btn {
+            flex-grow: 1;
+            margin: 0 5px;
+        }
+
+    .flex-container a.btn:last-child {
+        margin-right: 0;
+    }
+
+    .scrollable-container {
+        position: absolute; /* Position the container absolutely */
+        bottom: 0; /* Align to the bottom of the card */
+        right: 0; /* Align to the right of the card */
+        max-height: 135px; /* Set the maximum height for the scrollable container */
+        overflow-y: auto; /* Add a vertical scrollbar if needed */
+        width: 60%; /* Set the desired width for the scrollable container */
+        border: 1px solid #ccc;
+        background-color: aliceblue
+    }
+
+    .sprint-description-box {
+        top: 0;
+        max-height: 120;
+        overflow-y: auto;
+        width: 30%;
+        border: 1px solid #ccc;
+        background-color: aliceblue
+    }
+
+    .rating-container {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+    }
+
+    .column {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #ccc;
+        margin: 0 5px;
+        box-sizing: border-box;
+    }
+
+    ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+        ul li {
+            margin-bottom: 5px;
+        }
+
+    .rounded-button {
+        height: 35px;
+        width: 35px;
+        border-radius: 50%; /* Set border radius to 50% to create a circular button */
+        padding: 5px; /* Add padding for spacing within the circular button */
+    }
+
+    .custom-btn {
+        background-color: antiquewhite; /* Replace with your desired background color */
+        color: black; /* Replace with your desired text color */
+        /* Add any other custom styling you need */
+    }
+</style>
+<div class="flex-container">
+    <div style="text-align: left;">
+        <a asp-action="ViewAllUser" class="btn custom-btn m-2 rounded-button">
+            <i class="fas fa-arrow-left" style="color:black"></i>
+        </a>
+    </div>
+    <input type="date" id="startDate" name="startDate" onchange="loadFilteredSprints()" />
+    <input type="date" id="endDate" name="endDate" onchange="loadFilteredSprints()" />
+    <a class="btn custom-btn m-2" onclick="setDates('2023-01-01', '2023-03-31')">Quarter 1</a>
+    <a class="btn custom-btn m-2" onclick="setDates('2023-04-01', '2023-06-30')">Quarter 2</a>
+    <a class="btn custom-btn m-2" onclick="setDates('2023-07-01', '2023-09-30')">Quarter 3</a>
+    <a class="btn custom-btn m-2" onclick="setDates('2023-10-01', '2023-12-31')">Quarter 4</a>
+    <!--<input id="filterButton" type="submit" class="btn btn-info m-2" value="Filter"></input>-->
+
+</div>
+<script>
+    function setDates(startDate, endDate) {
+        document.getElementById("startDate").value = startDate;
+        document.getElementById("endDate").value = endDate;
+        loadFilteredSprints();
+    }
+    document.getElementById('startDate').value = '2023-01-01';
+    // Automatically fill end date with current date
+    var currentDate = new Date().toISOString().split('T')[0];
+    document.getElementById('endDate').value = currentDate;
+
+    //filtered button
+    /* debugger;
+     function handleInputChange() {
+         var startDate = document.getElementById("startDate").value;
+         var endDate = document.getElementById("endDate").value;
+
+         // Perform your functionality based on the values of startDate and endDate
+         if (startDate !== '' && endDate !== '') {
+             // Both fields have values, perform some action
+             console.log("Both fields have values:", startDate, endDate);
+             // Add your functionality here
+         } else {
+             // At least one field is empty, do nothing or show a message
+             console.log("One or both fields are empty");
+             // Add your functionality here
+         }
+     }*/
+    // Function to load filtered sprints
+    function loadFilteredSprints() {
+        var startDate = document.getElementById('startDate').value;
+        var endDate = document.getElementById('endDate').value;
+        function getUserIdFromUrl() {
+            // Get the full URL
+            var url = window.location.href;
+
+            // Split the URL path into parts using '/'
+            var parts = url.split('/');
+
+            // Find the index of the 'ViewUserSprint' segment
+            var viewUserSprintIndex = parts.indexOf('NViewUserSprint');
+
+            // The user ID will be the next segment after 'ViewUserSprint'
+            if (viewUserSprintIndex !== -1 && viewUserSprintIndex < parts.length - 1) {
+                var userId = parts[viewUserSprintIndex + 1];
+                return userId;
+            } else {
+                // Return null or handle the case where the user ID is not found
+                return null;
+            }
+        }
+        var userId = getUserIdFromUrl();
+        if (startDate !== '' && endDate !== '') {
+            // Both fields have values, perform some action
+            console.log("Both fields have values:", startDate, endDate);
+            // Add your functionality here
+        } else {
+            // At least one field is empty, do nothing or show a message
+            console.log("One or both fields are empty");
+            // Add your functionality here
+        }
+        // Call the controller function 'FilteredSprints' with the two dates
+        // This will depend on how you have set up your controller and routes
+        // Here is a simple example using fetch to make a GET request
+        $.ajax({
+            url: '/Dashboard/FilteredUserSprints',
+            type: 'GET',
+            data: {
+                startDate: startDate,
+                endDate: endDate,
+                userId:userId
+            },
+            success: function (data) {
+                var sprintsDiv = $('#sprints');
+
+                // Load the content of the partial view into the sprintsDiv
+                sprintsDiv.html(data);
+                // This function will be executed after the content is loaded
+                console.log('Partial view loaded successfully');
+
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.error('Error fetching filtered sprints:', errorThrown);
+            }
+        });
+    }
+
+    // Initial load of sprints on page load
+    loadFilteredSprints();
+
+    // Load sprints when date inputs change
+    $("#startDate, #endDate").change(function () {
+        loadFilteredSprints();
+    });
+</script>
+<div><h3>   </h3></div>
+<div id="sprints">
+</div>
+

@@ -1,0 +1,309 @@
+﻿@model TeamManageSystem.Models.Account.Dashboard
+@{
+    ViewData["Title"] = "ADashboard";
+    Layout = "~/Views/Shared/_Layout_forDashboard.cshtml";
+}
+@{
+    string userName = User.Identity.IsAuthenticated ? User.Identity.Name : ""; // Get the username
+}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-g2iBx9d+AkZ3Q2p9icRtCFz8qiVZ9d0XsxbCPyvB0USQczYHkaQHEGUKG7ed70sW5R8I5P2FkjDljW5A48EpMw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<style>
+ /*--------------------------------------------------*/
+    .card:hover {
+        transform: scale(1.1); /* Increase the size on hover */
+        transition: transform 0.3s ease; /* Add a smooth transition effect */
+        box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1); /* Add a shadow on hover */
+        background-color: black; /* Change the background color on hover */
+    }
+    /* Style for the cards container aqua*/
+    .cards-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 100px;
+    }
+
+    /* Style for the cards */
+    .card {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 300px;
+        height: 200px;
+        background-color: #f0f0f0;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 25px;
+        box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1); /* Add box shadow to the card */
+        background: linear-gradient(to bottom, lightcyan,antiquewhite);
+    }
+
+    /* Add more specific styles for each card based on the table */
+    /* You can customize the colors and other styles as per your preference */
+    .card-tmembers {
+        background-color: lightcyan;
+    }
+
+    .card-sprints {
+        background-color: lightcyan;
+    }
+
+    .card-ratings {
+        background-color: lightcyan;
+    }
+
+
+    /* Add styles for heading and content inside the cards */
+    .card h4 {
+        margin: 0;
+        font-size: 18px;
+    }
+
+    .card p {
+        margin: 0;
+        font-size: 16px;
+        color: black;
+    }
+
+    /* Increase the size of the icon
+        .card i {
+            font-size: 70px;
+            margin-bottom: 10px;
+            color: white;
+        }*/
+    /*rating style*/
+    /* Apply flexbox container styles */
+    .flex-container {
+        display: flex;
+        justify-content: space-between;
+    }
+
+        /* Optional styling for the <h1> elements */
+        .flex-container h1 {
+            margin: 0;
+        }
+
+    .custom-card-spacing {
+        margin: 0 50px; /* Adjust this value to control the space between the cards */
+    }
+
+    .custom-btn {
+        background-color: antiquewhite; /* Replace with your desired background color */
+        color: black; /* Replace with your desired text color */
+        /* Add any other custom styling you need */
+    }
+
+    .dashboard-container {
+        display: flex;
+    }
+
+    .sidebar {
+        margin-top: -2%;
+        margin-left: -16%;
+        width: 25%;
+        height: 800px;
+        background: linear-gradient(to bottom, lightcyan, antiquewhite);
+        padding: 20px;
+        box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .user-profile img {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        margin-bottom: 10px;
+    }
+
+    .main-content {
+        flex: 1;
+        padding: 20px;
+    }
+
+    .color-btn {
+        background-color: gray;
+        color: white;
+    }
+
+    .edit-button-container {
+        text-align: left;
+        margin-left: 10px; /* Adjust the value as needed */
+    }
+
+    /* The Modal (background) */
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1; /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    }
+
+    /* Modal Content/Box */
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto; /* 15% from the top and centered */
+        padding: 20px;
+        border: 1px solid #888;
+        width: 40%; /* Could be more or less, depending on screen size */
+    }
+
+    /* The Close Button */
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+    .scrollable-box {
+        height: 300px; /* Adjust the height as needed */
+        overflow: auto;
+        margin-top: 20px; /* Add some space below the user profile information */
+        padding: 10px; /* Add padding to the scrollable box */
+        background-color: lightcyan; /* Set background color */
+        border: 1px solid #ddd; /* Add a border for separation */
+        border-radius: 5px; /* Add rounded corners */
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
+    }
+
+    #messagesList {
+        /* Adjust the container styles as needed */
+        max-height: 300px; /* Limit the height and enable scrolling as needed */
+        /*overflow-y: auto; /* Enable vertical scrolling */
+        padding: 10px; /* Add padding for spacing */
+    }
+
+    .message {
+        /* Adjust individual message styles as needed */
+        margin-bottom: 5px; /* Add vertical spacing between messages */
+    }
+</style>
+<script src="_content/Microsoft.AspNetCore.Components.Web.Extensions/signalr.js"></script>
+<script src="~/js/signalr/dist/browser/signalr.js"></script>
+<script src="~/js/chat.js"></script>
+<link rel="stylesheet" href="~/css/animation.css" />
+<div id="id01" class="modal">
+    <div class="modal-content" style="background-color:lightcyan">
+        <div class="container">
+            <span onclick="closeModal()"
+                  class="w3-button w3-display-topright" style="cursor:pointer; font-size: 28px; font-weight: bold;">&times;</span>
+            <div id="profilePartialContainer">
+            </div>
+        </div>
+    </div>
+</div>
+<div class="dashboard-container">
+    <div class="sidebar">
+        <div>
+            <h4 class="text-center">PROFILE</h4>
+            <hr />
+            <div><i class="fas fa-user"></i> @Model.usermodel.Username</div>
+            <hr />
+            <div><i class="fas fa-envelope"></i> @Model.usermodel.Email</div>
+            <hr />
+            <div><i class="fas fa-mobile-alt"></i> @Model.usermodel.Mobile</div>
+            <hr />
+            <button class="btn color-btn" onclick="openModal()" title="Edit Profile"><i class="fas fa-edit"></i></button><h2> </h2>
+            <a asp-controller="Clickup" asp-action="GetSpaces" class="btn btn-warning" title="update lits and spaces"><i class="fas fa-list"></i> Update</a>
+            <a asp-controller="Clickup" asp-action="GetTasks" class="btn btn-warning" title="update tasks and assignees" style="margin-left:10px;"><i class="fas fa-tasks"></i> Update</a>
+        </div>
+        <!-- Scrollable box -->
+        <div class="container" style="background-color:antiquewhite; margin-top:10px;">
+            <div class="row p-1">
+                <div class="col-5"><input type="hidden" id="userInput" value="@userName" /></div>
+            </div>
+            <div class="row p-1">
+                <div class="col-9"><input type="text" class="w-100" id="messageInput" placeholder="Type Here" /></div>
+                <div class="col-3">
+                    <button id="sendButton" type="button" class="btn btn-success">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="scrollable-box">
+                <div class="container">
+                    <div class="row p-1">
+                        <ul id="messagesList"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="main-content">
+<div class="flex-container">
+    <a asp-action="ViewAllMembers" class="btn custom-btn" >View All Members</a>
+    <div>
+        <a asp-action="ViewAllUser" class="btn custom-btn"><i class="fas fa-user-tie" style=" color: darkslategrey;"></i>  View Team Leaders</a>
+    </div>
+    <a asp-action="ViewAllSprints" class="btn custom-btn" >View All Sprints</a>
+</div>
+
+<div class="cards-container">
+    <div class="card card-tmembers">
+        <i class="fas fa-users" style="font-size: 70px; margin-bottom: 10px; color: darkslategrey;"></i> <!-- Icon for Total Members -->
+        <hr />
+        <div>
+            <h4>Total Members</h4>
+            <p class="text-center">@Model.MembersModel.Count</p>
+        </div>
+    </div>
+
+    <div class="card card-sprints">
+        <i class="fas fa-tasks" style="font-size: 70px; margin-bottom: 10px; color: darkslategrey;"></i> <!-- Icon for Sprints -->
+        <hr />
+        <div>
+            <h4>Total Sprints</h4>
+            <p class="text-center">@Model.SprintsModel.Count</p>
+        </div>
+    </div>
+
+    <div class="card card-ratings">
+        <i class="fas fa-user fa-3x" style="font-size: 70px; margin-bottom: 10px; color: darkslategrey;"></i> <!-- Icon for Ratings -->
+        <hr />
+        <div>
+            <h4>Team Leaders</h4>
+            <p class="text-center">@Model.UsersModel.Count</p>
+        </div>
+    </div>
+ </div>
+</div>
+</div>
+<script>
+    function openModal() {
+        var modal = document.getElementById('id01');
+        modal.style.display = 'block';
+        $.ajax({
+            url: '@Url.Action("Profiles", "Dashboard")', // Replace with the actual controller and action
+            type: 'GET',
+            dataType: 'html',
+            success: function (data) {
+                var sprintsDiv = $('#profilePartialContainer');
+
+                // Load the content of the partial view into the sprintsDiv
+                sprintsDiv.html(data);
+                // This function will be executed after the content is loaded
+                console.log('Partial view loaded successfully');
+            },
+            error: function () {
+                alert('Error loading profile partial.');
+            }
+        });
+    }
+    function closeModal() {
+        var modal = document.getElementById('id01');
+        modal.style.display = 'none';
+    }
+</script>

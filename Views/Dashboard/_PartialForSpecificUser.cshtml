@@ -1,0 +1,212 @@
+﻿@model TeamManageSystem.Models.Account.MainSprints
+
+@{
+    double totalAverageRating = 0.0;
+    int sprintCount = 0;
+}
+<style>
+    body {
+        background-image: url('https://img.freepik.com/free-photo/background_53876-32169.jpg'); /* Replace 'path/to/your/image.jpg' with the path to your image */
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center center;
+    }
+
+    .custom-btn {
+        background-color: antiquewhite; /* Replace with your desired background color */
+        color: black; /* Replace with your desired text color */
+        /* Add any other custom styling you need */
+    }
+
+    .flex-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        /* Optional styling for the <h2> elements */
+        .flex-container h2 {
+            margin: 0;
+        }
+
+    .middle-elements {
+        display: flex;
+        align-items: center;
+        flex-grow: 1;
+        flex-basis: 60%;
+        justify-content: space-between;
+        background-color: aliceblue; /* Background color for the bar */
+        padding: 3px; /* Add padding to space the elements from the bar */
+        border-radius: 2px; /* Add border radius for the bar */
+    }
+
+        .middle-elements input[type="date"],
+        .middle-elements a.btn {
+            flex-grow: 1;
+            margin: 0 5px;
+        }
+
+    .flex-container a.btn:last-child {
+        margin-right: 0;
+    }
+
+    .scrollable-container {
+        position: absolute; /* Position the container absolutely */
+        bottom: 0; /* Align to the bottom of the card */
+        right: 0; /* Align to the right of the card */
+        max-height: 99px; /* Set the maximum height for the scrollable container */
+        overflow-y: auto; /* Add a vertical scrollbar if needed */
+        width: 650px; /* Set the desired width for the scrollable container */
+        border: 1px solid #ccc;
+        background-color: aliceblue
+    }
+
+    .sprint-description-box {
+        overflow-y: auto;
+        width: 30%;
+        border: 1px solid #ccc;
+        background-color: aliceblue
+    }
+
+    .rating-container {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 3px;
+        width: 600px;
+    }
+
+    .column {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #ccc;
+        margin: 0 2px;
+        box-sizing: border-box;
+    }
+
+    ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+        ul li {
+            margin-bottom: 5px;
+        }
+
+    .custom-button {
+        background-color: darkorange; /* Replace with your desired color value */
+        /* Text color on the button */
+        /* Add any additional styling you want */
+    }
+
+    .rounded-button {
+        height: 45px;
+        width: 45px;
+        border-radius: 50%; /* Set border radius to 50% to create a circular button */
+        padding: 10px; /* Add padding for spacing within the circular button */
+    }
+</style>
+<div class="d-flex justify-content-between align-items-center">
+    <div>
+        <!--<a href="@Url.Action("GenerateSprintPdf", "Dashboard", new { membersJson = Json.Serialize(Model) })" class="btn btn-warning" style="padding: 10px 20px; cursor: pointer;">-->
+        <!--<i class="fas fa-download" style="margin-right: 5px;"></i>Pdf-->
+        <!--</a>-->
+    </div>
+</div>
+@foreach (var item in Model.Sprints)
+{
+    <div>
+        <div class="card bg-light mb-3 sprint-card" style="width:82rem; height: 100px;" data-sprint-start="@item.SDate" data-sprint-end="@item.EDate" box-shadow="0 4px 8px rgba(0, 0, 0, 0.1)">
+            <div class="card-header" style="background-color: lightcyan; height:40px ">
+                @Html.DisplayFor(modelItem => item.Title) <dl class="row" style="margin-top:-24px">
+                    <div class="col-sm-2">
+                        <h5>  </h5>
+                    </div>
+                    <div class="col-sm-2">
+                        Sprint No : @Html.DisplayFor(modelItem => item.SprintNo)
+                    </div>
+                    <div class="col-sm-2">
+                        Total Days : <span class="total-days">@((item.EDate - item.SDate).TotalDays)</span>
+                    </div>
+                </dl>
+            </div>
+            <div class="card-body" align="center">
+            </div>
+            <div style="margin-top:-10px">
+                Start Date : @Html.DisplayFor(modelItem => item.SDate) <span>   |  </span> End Date : @Html.DisplayFor(modelItem => item.EDate)
+            </div>
+            <div class="scrollable-container">
+                <!-- Team member information goes here -->
+                <!-- You can use a <ul> or <div> to display the team members -->
+                <div class="rating-container">
+                    <div class="column">
+                        <b>Member Name</b>
+                        <ul>
+                            @foreach (var member in Model.TeaMembers)
+                            {
+                                var sprintRating = Model.SprintRatings?.FirstOrDefault(sr => sr.Mid == member.Id && sr.SprintId == item.Id && sr.IsDelete == 0);
+                                <li>
+                                    @if (sprintRating != null)
+                                    {
+                                        <span> @sprintRating.Mname</span>
+                                    }
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <b>Sprint Ratings</b>
+                        <ul>
+                            @foreach (var member in Model.TeaMembers)
+                            {
+                                var sprintRating = Model.SprintRatings?.FirstOrDefault(sr => sr.Mid == member.Id && sr.SprintId == item.Id && sr.IsDelete == 0);
+                                <li>
+                                    @if (sprintRating != null)
+                                    {
+                                        <span> @sprintRating.SRating</span>
+                                    }
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <b> Average Sprint Rating </b>
+                        @if (Model.SprintRatings != null && Model.SprintRatings.Any(sr => sr.SprintId == item.Id && sr.SRating > 0))
+                        {
+                            var filteredRatings = Model.SprintRatings.Where(sr => sr.SprintId == item.Id && sr.SRating > 0);
+                            var averageSprintRating = filteredRatings.Average(sr => sr.SRating);
+                            <span>Average Scores : @string.Format("{0:F2}", averageSprintRating)</span>
+                            totalAverageRating += averageSprintRating;
+                            sprintCount++;
+                        }
+                        else
+                        {
+                            <span><br>No Average Rating for Sprint</span>
+                        }
+                        <hr />
+                        <b>Sprint Description</b>
+                        <p>@Html.DisplayFor(modelItem => item.Discription)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        var sprintId = @item.Id; // Use the 'sp' variable
+        var ratingsData = @Html.Raw(Json.Serialize(Model.SprintRatings.Where(sr => sr.SprintId == item.Id).ToList()));
+        localStorage.setItem("sprintRatings_" + sprintId, JSON.stringify(ratingsData));
+        //calculate total days
+        var startDate = new Date('@item.SDate');
+        var endDate = new Date('@item.EDate');
+        var totalDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)); // Calculate the difference and convert to days
+        document.querySelector('.total-days').textContent = totalDays;
+    </script>
+}
+@if (sprintCount > 0)
+{
+    double overallAverageRating = totalAverageRating / sprintCount;
+    <div style="background-color: #f2f2f2; padding: 10px; border-radius: 5px; display: inline-block;">
+        <span style="font-weight: bold;">Overall Average Rating:</span>
+        <span style="color: #FF5733; font-size: 18px;">@string.Format("{0:F2}", overallAverageRating)</span>
+    </div>
+}
+

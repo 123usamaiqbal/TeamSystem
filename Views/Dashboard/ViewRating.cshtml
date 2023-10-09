@@ -1,0 +1,73 @@
+﻿@model TeamManageSystem.Models.Account.Rating
+
+@{
+    ViewData["Title"] = "ViewRating";
+    Layout = "~/Views/Shared/_Layout_forDashboard.cshtml";
+}
+<style>
+    body {
+        background-image: url('https://img.freepik.com/free-photo/background_53876-32169.jpg'); /* Replace 'path/to/your/image.jpg' with the path to your image */
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center center;
+    }
+
+    .rounded-button {
+        height: 45px;
+        width: 45px;
+        border-radius: 50%; /* Set border radius to 50% to create a circular button */
+        padding: 10px; /* Add padding for spacing within the circular button */
+    }
+</style>
+<h1 class="text-center" style="color:aliceblue">Average Rating</h1>
+<div class="d-flex justify-content-between align-items-center">
+    <div>
+        <a asp-action="ViewTeam" class="btn btn-light m-2 rounded-button">
+            <i class="fas fa-arrow-left" style="color:black"></i>
+        </a>
+    </div>
+    <div>
+        <a asp-action="InputFilterRating" class="btn btn-warning" asp-route-id="@Model.MemberId">Specific Rating</a>
+    </div>
+</div>
+<hr />
+
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="card bg-light mb-3" style="width:30rem; margin-top: 30px">
+        <div class="card-header text-center" style="background-color: lightcyan">Ratings</div>
+        <div class="card-body" align="center">
+            <dl class="row">
+                <dt class="col-sm-4">
+                    @Html.DisplayNameFor(model => model.MemberName)
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.DisplayFor(model => model.MemberName)
+                </dd>
+                <h3>   </h3>
+                <dt class="col-sm-4">
+                    @Html.DisplayNameFor(model => model.Ratings)
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.DisplayFor(model => model.Ratings)
+                </dd>
+                    <h3>   </h3>
+                <dt class="col-sm-4">
+                    @Html.DisplayNameFor(model => model.FeedBack)
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.DisplayFor(model => model.FeedBack)
+                </dd>
+            </dl>
+                <h3>   </h3>
+                <a asp-action="BonusGenerate" asp-route-id="@Model?.Id" class="btn btn-dark">Generate Bonus</a>
+                <!--<input type="submit" asp-action="Edit" asp-route-id="@Model?.Id" value="Edit" class="btn btn-info" />-->
+                <!--<input type="submit" asp-action="Index" value="Back to List" class="btn btn-primary" />-->
+                <!--<a asp-action="ViewTeam" class="btn btn-primary">Back to List</a>-->
+        </div>
+    </div>
+</div>
+</div>
+
+

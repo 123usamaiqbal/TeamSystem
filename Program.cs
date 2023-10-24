@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using TeamManageSystem.Data;
 using TeamManageSystem.Hubs;
+using TeamManageSystem;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<TeamManageContext>(options =>
@@ -32,7 +33,7 @@ builder.Services.AddSignalR();
 //builder.Services.AddIdentity<IdentityUser, IdentityRole>()
 //            .AddEntityFrameworkStores<TeamManageContext>()
 //            .AddDefaultTokenProviders();
-
+builder.Services.AddScoped<DatabaseExistenceChecker>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -54,5 +55,18 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Account}/{action=FrontPage}/{id?}");
 app.MapHub<ChatHub>("/chatHub");
+using var scope = app.Services.CreateScope();
+var dbExistenceChecker = scope.ServiceProvider.GetRequiredService<DatabaseExistenceChecker>();
 
+if (!dbExistenceChecker.DoesDatabaseExist())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<TeamManageContext>();
+    dbContext.Database.Migrate(); // Apply migrations if the database is empty.
+}
+
+using (var scopes = builder.Services.BuildServiceProvider().CreateScope())
+{
+    var context = scopes.ServiceProvider.GetRequiredService<TeamManageContext>();
+    DbSeeder.SeedData(context);
+}
 app.Run();

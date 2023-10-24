@@ -12,6 +12,7 @@ using Task = TeamManageSystem.Models.Account.Task;
 using SprintRating = TeamManageSystem.Models.Account.SprintRating;
 using MainSprint = TeamManageSystem.Models.Account.MainSprints;
 using TeamRating = TeamManageSystem.Models.Account.TeamRating;
+using StatusColors = TeamManageSystem.Models.ClickupModels.StatusColors;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using TeamManageSystem.Models.ViewModel;
@@ -28,23 +29,29 @@ using System.Collections.Immutable;
 using PdfSharpCore.Drawing;
 using PdfSharpCore.Pdf;
 using System.Collections.Generic;
+using static Azure.Core.HttpHeader;
+using System.Diagnostics;
 
 namespace TeamManageSystem.Controllers.Account
 {
     [Authorize]
+
     public class DashboardController : Controller
     {
-        //private readonly UserManager<IdentityUser> _userManager;
+        
+        
         private readonly TeamManageContext _context;
         public DashboardController(TeamManageContext context/* , UserManager<IdentityUser> userManager*/)
         {
-
-            _context = context;
+             _context = context;
             // _userManager = userManager;
 
         }
         public IActionResult BestPerformer()
         {
+            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "-1";
             string userId = null;
             if (User.Identity.IsAuthenticated)
             {
@@ -65,40 +72,45 @@ namespace TeamManageSystem.Controllers.Account
         }
         public IActionResult TDashboard()
         {
-
-            string userId = null;
+            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "-1";
             if (User.Identity.IsAuthenticated)
             {
-
+                string userId = null;
                 userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                int userId1;
+                int.TryParse(userId, out userId1);
+                var profileuser = _context.User.Where(p => p.Id == userId1).FirstOrDefault();
+                var members = _context.TMembers.Where(m => m.LeadId == userId1).ToList();
+                var sprints = _context.Sprint.Where(s => s.CreatedBy == userId1).ToList();
+                var memberIds = members.Select(m => m.Id).ToList();
+                var ratings = _context.Rating.Where(r => memberIds.Contains(r.MemberId)).OrderByDescending(r => r.Ratings).ToList();
+
+                var highestRating = ratings.FirstOrDefault();
+
+                // If you want to find all records with the highest Ratings (in case of ties)
+                var highestRatings = ratings
+                    .Where(r => r.Ratings == highestRating?.Ratings)
+                    .ToList();
+
+                var dashboard = new Dashboard
+                {
+                    MembersModel = members,
+                    SprintsModel = sprints,
+                    RatingsModel = ratings,
+                    usermodel = profileuser,
+                };
+                return View(dashboard);
             }
-            int userId1;
-            int.TryParse(userId, out userId1);
-            var profileuser = _context.User.Where(p => p.Id == userId1).FirstOrDefault();
-            var members = _context.TMembers.Where(m => m.LeadId == userId1).ToList();
-            var sprints = _context.Sprint.Where(s => s.CreatedBy == userId1).ToList();
-            var memberIds = members.Select(m => m.Id).ToList();
-            var ratings = _context.Rating.Where(r => memberIds.Contains(r.MemberId)).OrderByDescending(r => r.Ratings).ToList();
-
-            var highestRating = ratings.FirstOrDefault();
-
-            // If you want to find all records with the highest Ratings (in case of ties)
-            var highestRatings = ratings
-                .Where(r => r.Ratings == highestRating?.Ratings)
-                .ToList();
-
-            var dashboard = new Dashboard
-            {
-                MembersModel = members,
-                SprintsModel = sprints,
-                RatingsModel = ratings,
-                usermodel = profileuser,
-            };
-            return View(dashboard);
+            return NotFound();
         }
         [HttpGet]
         public IActionResult Profiles()
         {
+            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "-1";
             string userId = null;
             if (User.Identity.IsAuthenticated)
             {
@@ -190,74 +202,83 @@ namespace TeamManageSystem.Controllers.Account
         [HttpGet]
         public IActionResult AddScores(int id)
         {
-            string userId = null;
-            // Get the logged-in user's UserId (replace this with your actual method of getting the UserId)
-            userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            int userId1;
-            int.TryParse(userId, out userId1);
-            var rating = _context.SprintRating.Where(r => r.SprintId == id).ToList();
-            var teamMembers = _context.TMembers.Where(m => m.LeadId == userId1).ToList();
-            var sprintrating = _context.SprintRating.Where(s => s.SprintId == id && s.IsDelete == 0).ToList();
-            var sprintRating = _context.SprintRating.Where(s => s.SprintId == id && s.IsDelete == 1).ToList();
-
-            if (sprintrating.Count == 0 && sprintRating.Count == 0)
+            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "-1";
+            if (User.Identity.IsAuthenticated)
             {
-                var viewModelList = teamMembers.Select(member => new SRatingViewModel
-                {
-                    MemberID = member.Id,
-                    MemberName = member.TMname,
-                    SprintRating = 0 // Set SprintRating to 0 for all members
-                }).ToList();
-                var modellist = new ScoresModel
-                {
-                    RatingViewModel = viewModelList,
-                    SprintRatings = rating,
-                };
+                string userId = null;
+                // Get the logged-in user's UserId (replace this with your actual method of getting the UserId)
+                userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-                return View(modellist);
-            }
-            else if (sprintrating.Count == 0 && sprintRating.Count != 0)
-            {
-                var sprintRatingMemberNames = sprintRating.Select(s => s.Mname).ToList();
+                int userId1;
+                int.TryParse(userId, out userId1);
+                var rating = _context.SprintRating.Where(r => r.SprintId == id).ToList();
+                var teamMembers = _context.TMembers.Where(m => m.LeadId == userId1).ToList();
+                var sprintrating = _context.SprintRating.Where(s => s.SprintId == id && s.IsDelete == 0).ToList();
+                var sprintRating = _context.SprintRating.Where(s => s.SprintId == id && s.IsDelete == 1).ToList();
 
-                // Get the team members whose names are not in the sprintRatingMemberNames list
-                var unmatchedTeamMembers = teamMembers
-                    .Where(m => !sprintRatingMemberNames.Contains(m.TMname))
-                    .ToList();
-                var viewModelList = unmatchedTeamMembers.Select(member => new SRatingViewModel
+                if (sprintrating.Count == 0 && sprintRating.Count == 0)
                 {
-                    MemberID = member.Id,
-                    MemberName = member.TMname,
-                    SprintRating = 0 // Initialize SprintRating to 0 for the form
-                }).ToList();
-                var modellist = new ScoresModel
+                    var viewModelList = teamMembers.Select(member => new SRatingViewModel
+                    {
+                        MemberID = member.Id,
+                        MemberName = member.TMname,
+                        SprintRating = 0 // Set SprintRating to 0 for all members
+                    }).ToList();
+                    var modellist = new ScoresModel
+                    {
+                        RatingViewModel = viewModelList,
+                        SprintRatings = rating,
+                    };
+
+                    return View(modellist);
+
+
+                }
+                else if (sprintrating.Count == 0 && sprintRating.Count != 0)
                 {
-                    RatingViewModel = viewModelList,
-                    SprintRatings = rating,
-                };
-                return View(modellist);
+                    var sprintRatingMemberNames = sprintRating.Select(s => s.Mname).ToList();
+
+                    // Get the team members whose names are not in the sprintRatingMemberNames list
+                    var unmatchedTeamMembers = teamMembers
+                        .Where(m => !sprintRatingMemberNames.Contains(m.TMname))
+                        .ToList();
+                    var viewModelList = unmatchedTeamMembers.Select(member => new SRatingViewModel
+                    {
+                        MemberID = member.Id,
+                        MemberName = member.TMname,
+                        SprintRating = 0 // Initialize SprintRating to 0 for the form
+                    }).ToList();
+                    var modellist = new ScoresModel
+                    {
+                        RatingViewModel = viewModelList,
+                        SprintRatings = rating,
+                    };
+                    return View(modellist);
+                }
+                else
+                {
+                    var viewModelList = sprintrating.Select(member => new SRatingViewModel
+                    {
+                        MemberID = member.Mid,
+                        MemberName = member.Mname,
+                        SprintRating = 0 // Initialize SprintRating to 0 for the form
+                    }).ToList();
+                    var modellist = new ScoresModel
+                    {
+                        RatingViewModel = viewModelList,
+                        SprintRatings = rating,
+                    };
+                    return View(modellist);
+                }
             }
-            else
-            {
-                var viewModelList = sprintrating.Select(member => new SRatingViewModel
-                {
-                    MemberID = member.Mid,
-                    MemberName = member.Mname,
-                    SprintRating = 0 // Initialize SprintRating to 0 for the form
-                }).ToList();
-                var modellist = new ScoresModel
-                {
-                    RatingViewModel = viewModelList,
-                    SprintRatings = rating,
-                };
-                return View(modellist);
-            }
-            return View();
+            return NotFound();
         }
 
         public IActionResult CalculateRating(int? id)
         {
+          
             if (id == null)
             {
                 return NotFound();
@@ -343,7 +364,14 @@ namespace TeamManageSystem.Controllers.Account
 
         public IActionResult AddSprint()
         {
-            return View();
+            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "-1";
+            if(User.Identity.IsAuthenticated)
+            {
+                return View();
+            }
+            return NotFound();
         }
 
         [HttpPost]
@@ -394,10 +422,6 @@ namespace TeamManageSystem.Controllers.Account
             _context.SaveChanges();
             TempData["SsuccessMessage"] = "Sprint Add Successfully";
             return RedirectToAction("TDashboard", "Dashboard");
-
-
-
-
         }
 
         /* public async Task<IActionResult> ViewSprint()
@@ -427,6 +451,9 @@ namespace TeamManageSystem.Controllers.Account
 
         public IActionResult ViewSprints()
         {
+            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "-1";
             try
             {
                 string userId = null;
@@ -434,28 +461,29 @@ namespace TeamManageSystem.Controllers.Account
                 {
 
                     userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                }
-                int userId1;
-                int.TryParse(userId, out userId1);
-                var sprints = _context.Sprint
-                .Where(s => s.CreatedBy == userId1)
-                .ToList();
-                var members = _context.TMembers.Where(m => m.LeadId == userId1).ToList();
-                var sprintRatings = _context.SprintRating.ToList()
-                      .Join(
-                          inner: members,
-                          outerKeySelector: sr => sr.Mid,
-                          innerKeySelector: member => member.Id,
-                          resultSelector: (sr, member) => sr)
-                      .ToList();
-                var mainsprints = new MainSprints
-                {
-                    Sprints = sprints,
-                    TeaMembers = members,
-                    SprintRatings = sprintRatings,
-                };
+                    int userId1;
+                    int.TryParse(userId, out userId1);
+                    var sprints = _context.Sprint
+                    .Where(s => s.CreatedBy == userId1)
+                    .ToList();
+                    var members = _context.TMembers.Where(m => m.LeadId == userId1).ToList();
+                    var sprintRatings = _context.SprintRating.ToList()
+                          .Join(
+                              inner: members,
+                              outerKeySelector: sr => sr.Mid,
+                              innerKeySelector: member => member.Id,
+                              resultSelector: (sr, member) => sr)
+                          .ToList();
+                    var mainsprints = new MainSprints
+                    {
+                        Sprints = sprints,
+                        TeaMembers = members,
+                        SprintRatings = sprintRatings,
+                    };
 
-                return View(mainsprints);
+                    return View(mainsprints);
+                }
+                return NotFound();
             }
             catch (Exception ex)
             {
@@ -467,6 +495,9 @@ namespace TeamManageSystem.Controllers.Account
 
         public IActionResult ViewTeam()
         {
+            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "-1";
             try
             {
                 string userId = null;
@@ -501,41 +532,54 @@ namespace TeamManageSystem.Controllers.Account
 
         public IActionResult BonusGenerate(int? id)
         {
-            if (id == null || _context.Rating == null)
+            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "-1";
+            if(User.Identity.IsAuthenticated)
             {
-                return NotFound();
+                if (id == null || _context.Rating == null)
+                {
+                    return NotFound();
+                }
+                var rating = _context.Rating.FirstOrDefault(r => r.Id == id);
+                var member = _context.TMembers.FirstOrDefault(m => m.Id == rating.MemberId);
+                if (rating == null)
+                {
+                    return NotFound();
+                }
+                decimal basicSalary = member.Salary;
+                int originalRating = rating.Ratings;
+                decimal bonus = 0;
+                string message = "";
+                if (originalRating == 4)
+                {
+                    bonus = (basicSalary / 100) * 5;
+                }
+                else if (originalRating == 5)
+                {
+                    bonus = (basicSalary / 100) * 10;
+                }
+                else
+                {
+                    message = "This Member is not eligible for bonus";
+                }
+                ViewBag.Message = message;
+                ViewBag.BonusRating = bonus;
+                return View(rating);
             }
-            var rating = _context.Rating.FirstOrDefault(r => r.Id == id);
-            var member = _context.TMembers.FirstOrDefault(m => m.Id == rating.MemberId);
-            if (rating == null)
-            {
-                return NotFound();
-            }
-            decimal basicSalary = member.Salary;
-            int originalRating = rating.Ratings;
-            decimal bonus = 0;
-            string message = "";
-            if (originalRating == 4)
-            {
-                bonus = (basicSalary / 100) * 5;
-            }
-            else if (originalRating == 5)
-            {
-                bonus = (basicSalary / 100) * 10;
-            }
-            else
-            {
-                message = "This Member is not eligible for bonus";
-            }
-            ViewBag.Message = message;
-            ViewBag.BonusRating = bonus;
-            return View(rating);
-
+            
+            return NotFound();
         }
 
         public IActionResult AddMember()
         {
-            return View();
+            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "-1";
+            if(User.Identity.IsAuthenticated)
+            { return View();
+            }
+            return NotFound();
         }
 
         [HttpPost]
@@ -583,6 +627,9 @@ namespace TeamManageSystem.Controllers.Account
         [HttpGet]
         public IActionResult FilteredSprints(DateTime startDate, DateTime endDate)
         {
+            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "-1";
             string userId = null;
             if (User.Identity.IsAuthenticated)
             {
@@ -620,7 +667,14 @@ namespace TeamManageSystem.Controllers.Account
         }*/
         public IActionResult InputFilterSprint()
         {
-            return View();
+            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "-1";
+            if (User.Identity.IsAuthenticated)
+            {
+                return View();
+            }
+                return NotFound();
         }
 
         [HttpPost]
@@ -653,11 +707,18 @@ namespace TeamManageSystem.Controllers.Account
 
         public IActionResult InputFilterRating(int id)
         {
-            var viewModel = new SprintViewModel
+            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "-1";
+            if(User.Identity.IsAuthenticated)
             {
-                Id = id // Assuming you have a property named "Id" in the SprintViewModel class
-            };
-            return View();
+                var viewModel = new SprintViewModel
+                {
+                    Id = id // Assuming you have a property named "Id" in the SprintViewModel class
+                };
+                return View();
+            }
+            return NotFound();
         }
         [HttpPost]
         [Route("Dashboard/InputFilterRating")]
@@ -768,7 +829,14 @@ namespace TeamManageSystem.Controllers.Account
 
         public IActionResult AddFeedback()
         {
-            return View();
+            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "-1";
+            if(User.Identity.IsAuthenticated)
+            {
+                return View();
+            }
+            return NotFound();
         }
 
         [HttpPost]
@@ -792,37 +860,44 @@ namespace TeamManageSystem.Controllers.Account
 
         public IActionResult FinalReport(int id)
         {
-            var sprintrating = _context.SprintRating.Where(s => s.Mid == id && s.IsDelete==0).ToList();
-            if (sprintrating == null)
+            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "-1";
+            if(User.Identity.IsAuthenticated)
             {
-                return BadRequest("This Member have no sprint ratings");
-            }
-            var rating = _context.Rating.FirstOrDefault(r => r.MemberId == id);
-            if (rating == null)
-            {
-                return BadRequest("This Member have no average sprint rating");
-            }
-            var sprintIds = sprintrating.Select(s => s.SprintId).ToList();
-            var sprints = _context.Sprint.Where(s => sprintIds.Contains(s.Id)).ToList();
-            /*var sprintRatingViewModels = sprintrating
-            .Join(sprints, sr => sr.SprintId, s => s.Id, (sr, s) => new SprintRatingViewModel
-            {
-                SprintId = sr.SprintId,
-                SprintName = s.Title,
-                Mname = sr.Mname,
-                SRating = sr.SRating
-            }).ToList();*/
-            var report = new Report
-            {
-                SprintRatingModel = sprintrating,
-                RatingModel = new Rating
+                var sprintrating = _context.SprintRating.Where(s => s.Mid == id && s.IsDelete == 0 && s.SRating != 0).ToList();
+                if (sprintrating == null)
                 {
-                    MemberName = rating.MemberName,
-                    Ratings = rating.Ratings,
-                    FeedBack = rating.FeedBack,
+                    return BadRequest("This Member have no sprint ratings");
                 }
-            };
-            return View(report);
+                var rating = _context.Rating.FirstOrDefault(r => r.MemberId == id);
+                if (rating == null)
+                {
+                    return BadRequest("This Member have no average sprint rating");
+                }
+                var sprintIds = sprintrating.Select(s => s.SprintId).ToList();
+                var sprints = _context.Sprint.Where(s => sprintIds.Contains(s.Id)).ToList();
+                /*var sprintRatingViewModels = sprintrating
+                .Join(sprints, sr => sr.SprintId, s => s.Id, (sr, s) => new SprintRatingViewModel
+                {
+                    SprintId = sr.SprintId,
+                    SprintName = s.Title,
+                    Mname = sr.Mname,
+                    SRating = sr.SRating
+                }).ToList();*/
+                var report = new Report
+                {
+                    SprintRatingModel = sprintrating,
+                    RatingModel = new Rating
+                    {
+                        MemberName = rating.MemberName,
+                        Ratings = rating.Ratings,
+                        FeedBack = rating.FeedBack,
+                    }
+                };
+                return View(report);
+            }
+            return NotFound();
         }
 
         public async Task<IActionResult> DeleteMember(int id)
@@ -854,9 +929,11 @@ namespace TeamManageSystem.Controllers.Account
             if (member != null)
             {
                 var sprintRatings = _context.SprintRating.Where(sr => sr.Mid == id).ToList();
+                var rating = _context.Rating.Where(r => r.MemberId == id).FirstOrDefault();
 
                 // Remove the related SprintRating records from the context
                 _context.SprintRating.RemoveRange(sprintRatings);
+                _context.Rating.Remove(rating);
                 _context.TMembers.Remove(member);
             }
 
@@ -865,31 +942,45 @@ namespace TeamManageSystem.Controllers.Account
         }
         public async Task<IActionResult> EditMembers(int? id)
         {
-            if (id == null || _context.TMembers == null)
+            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "-1";
+            if(User.Identity.IsAuthenticated)
             {
-                return NotFound();
-            }
+                if (id == null || _context.TMembers == null)
+                {
+                    return NotFound();
+                }
 
-            var members = await _context.TMembers.FindAsync(id);
-            if (members == null)
-            {
-                return NotFound();
+                var members = await _context.TMembers.FindAsync(id);
+                if (members == null)
+                {
+                    return NotFound();
+                }
+                return View(members);
             }
-            return View(members);
+            return NotFound();
         }
 
         public async Task<IActionResult> EditSprint(int? id)
         {
-            if (id == null || _context.Sprint == null)
+            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "-1";
+            if(User.Identity.IsAuthenticated)
             {
-                return NotFound();
+                if (id == null || _context.Sprint == null)
+                {
+                    return NotFound();
+                }
+                var sprint = await _context.Sprint.FindAsync(id);
+                if (sprint == null)
+                {
+                    return NotFound();
+                }
+                return View(sprint);
             }
-            var sprint = await _context.Sprint.FindAsync(id);
-            if (sprint == null)
-            {
-                return NotFound();
-            }
-            return View(sprint);
+            return NotFound();
         }
 
         [HttpPost]
@@ -941,6 +1032,9 @@ namespace TeamManageSystem.Controllers.Account
         [HttpGet]
         public IActionResult RemoveMember(int sprintId)
         {
+            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "-1";
             var sprintrating = _context.SprintRating.Where(s => s.SprintId == sprintId && s.IsDelete == 0).ToList();
             string userId = null;
             if (User.Identity.IsAuthenticated)
@@ -1023,6 +1117,9 @@ namespace TeamManageSystem.Controllers.Account
         [HttpGet]
         public IActionResult AddsprintMember(int sprintId)
         {
+            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "-1";
             string userId = null;
             if (User.Identity.IsAuthenticated)
             {
@@ -1132,46 +1229,50 @@ namespace TeamManageSystem.Controllers.Account
         //Admin Pannel Controller Actions 
         public IActionResult ADashboard()
         {
-
+            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "-1";
             string userId = null;
             if (User.Identity.IsAuthenticated)
             {
-
-                userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            }
-            int userId1;
-            int.TryParse(userId, out userId1);
-            var users = _context.User.Where(u => u.Id == userId1).SingleOrDefault();
-            if (users != null)
-            {
-                if (users.Role == "Admin")
+               userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                int userId1;
+                int.TryParse(userId, out userId1);
+                var users = _context.User.Where(u => u.Id == userId1).SingleOrDefault();
+                if (users != null)
                 {
-                    var members = _context.TMembers.ToList();
-                    var sprints = _context.Sprint.ToList();
-                    var teams = _context.User.Where(u => u.Role != users.Role).ToList();
-
-                    var dashboard = new Dashboard
+                    if (users.Role == "Admin")
                     {
-                        MembersModel = members,
-                        SprintsModel = sprints,
-                        UsersModel = teams,
-                        usermodel = users,
-                    };
-                    return View(dashboard);
+                        var members = _context.TMembers.ToList();
+                        var sprints = _context.Sprint.ToList();
+                        var teams = _context.User.Where(u => u.Role != users.Role).ToList();
+
+                        var dashboard = new Dashboard
+                        {
+                            MembersModel = members,
+                            SprintsModel = sprints,
+                            UsersModel = teams,
+                            usermodel = users,
+                        };
+                        return View(dashboard);
+                    }
+                    else
+                    {
+                        return NotFound();
+                    }
                 }
                 else
                 {
                     return NotFound();
                 }
             }
-            else
-            {
-                return NotFound();
-            }
+            return NotFound(); 
         }
         public IActionResult ViewAllMembers()
         {
-
+            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "-1";
             string userId = null;
             if (User.Identity.IsAuthenticated)
             {
@@ -1207,6 +1308,9 @@ namespace TeamManageSystem.Controllers.Account
         }
         public IActionResult ViewAllSprints()
         {
+            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "-1";
             try
             {
                 string userId = null;
@@ -1253,6 +1357,9 @@ namespace TeamManageSystem.Controllers.Account
         [HttpGet]
         public IActionResult FilteredUserSprints(DateTime startDate, DateTime endDate, string userId)
         {
+            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "-1";
             string userIds = null;
             if (User.Identity.IsAuthenticated)
             {
@@ -1298,6 +1405,9 @@ namespace TeamManageSystem.Controllers.Account
         [HttpGet]
         public IActionResult FilteredAllSprints(DateTime startDate, DateTime endDate)
         {
+            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "-1";
             string userId = null;
             if (User.Identity.IsAuthenticated)
             {
@@ -1362,11 +1472,21 @@ namespace TeamManageSystem.Controllers.Account
         */
         public IActionResult NViewUserSprint()
         {
-            return View();
+            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "-1";
+            if(User.Identity.IsAuthenticated)
+            {
+                return View();
+            }
+            return NotFound();
         }
         [HttpGet]
         public IActionResult ViewUserSprint(int id)
         {
+            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "-1";
             try
             {
                 string userId = null;
@@ -1470,6 +1590,9 @@ namespace TeamManageSystem.Controllers.Account
         }
         public IActionResult ViewAllUser()
         {
+            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "-1";
             string userId = null;
             if (User.Identity.IsAuthenticated)
             {
@@ -1614,55 +1737,109 @@ namespace TeamManageSystem.Controllers.Account
                 return RedirectToAction("AddScores", new { id = SprintId });
             }
         }
-        /* public async Task<IActionResult> ViewRating(int? id)
-       {
-           if (id == null)
-           {
-               return NotFound();
-           }
-           var rating = await _context.Rating
-               .FirstOrDefaultAsync(r => r.MemberId == id);
-           if (rating == null)
-           {
-               var sprintrating = await _context.SprintRating.Where(s => s.Mid == id && s.IsDelete == 0).ToListAsync();
-               var Member = await _context.TMembers.Where(m => m.Id == id).FirstOrDefaultAsync();
-               string mname = Member.TMname;
-               int sumSRating = sprintrating.Sum(s => s.SRating);
-               int countSRating = sprintrating.Count;
-               if (countSRating == 0)
-               {
-                   return BadRequest("There is no any Sprint Rating for this user! Firstly add Sprint Rating then View Whole Rating");
-               }
-               decimal avr = sumSRating / countSRating;
-               var data = new Rating()
-               {
-                   MemberId = Member.Id,
-                   MemberName = mname,
-                   Ratings = (int)avr,
-                   FeedBack = "",
-               };
 
-               _context.Rating.Add(data);
-               _context.SaveChanges();
-               return View(data);
-           }
+        public IActionResult ViewTasks(int? id)
+        {
+            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "-1";
+            string userId = null;
+            var taskdetails = new ViewTaskModel();
+            if (User.Identity.IsAuthenticated)
+            {
 
-           var sprintrate = await _context.SprintRating.Where(s => s.Mid == id && s.IsDelete == 0).ToListAsync();
-           int sumSRate = sprintrate.Sum(s => s.SRating);
-           int countSRate = sprintrate.Count;
-           decimal avrs = sumSRate / countSRate;
-           rating.Ratings = (int)avrs;
-           _context.SaveChanges();
-           return View(rating);
+                userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            }
+            int userId1;
+            int.TryParse(userId, out userId1);
+            var member = _context.TMembers.Where(m => m.LeadId == userId1).ToList();
+            var names = member.Select(m => m.TMname).ToList();
+            var sprint = _context.Sprint.Where(s => s.Id == id).FirstOrDefault();
+            var sprinttask = _context.ClikupTask.Where(t => (t.date_created >= sprint.SDate && t.date_created <= sprint.EDate) || (t.date_updated >= sprint.SDate && t.date_updated <= sprint.EDate)).ToList();
+            var taskids = sprinttask.Select(t => t.id).ToList();
+            var ratings = _context.SprintRating.Where(r => r.SprintId == id && r.IsDelete == 0).ToList();
+            var rates = _context.SprintRating.Where(r => r.SprintId == id && r.IsDelete == 1).ToList();
 
-           //var sprintrating = await _context.SprintRating.Where(s => s.Mid == id).ToListAsync();
-           //int sumSRating = sprintrating.Sum(s => s.SRating);
-           // int countSRating = sprintrating.Count;
-           // decimal avr = sumSRating / countSRating;
-           // rating.Ratings = (int)avr
-       }*/
+            if (ratings.Count == 0 && rates.Count == 0)
+            {
+                var sprintassignee = _context.ClickupTaskAssignee.Where(a => taskids.Contains(a.taskid) && names.Contains(a.username)).ToList();
+                var tasks = sprinttask.Where(task => _context.ClickupTaskAssignee.Any(a => a.taskid == task.id && names.Contains(a.username))).ToList();
+                taskdetails = new ViewTaskModel
+                {
+                    Assignees = sprintassignee,
+                    ClikupTasks = tasks,
+                };
+            }
+            else if (ratings.Count != 0)
+            {
+                var assignee = _context.ClickupTaskAssignee.AsEnumerable().Where(a => ratings.Any(r => r.Mname == a.username)).ToList();
+                //_context.ClickupTaskAssignee.Where(a => ratings.Any(r => r.Mname == a.username)).ToList();
+                //get the tasks wo have the above assignees
+                var tasks = sprinttask.Join(assignee, task => task.id, a => a.taskid, (task, a) => task).ToList();
+                taskdetails = new ViewTaskModel
+                {
+                    Assignees = assignee,
+                    ClikupTasks = tasks,
+                };
+            }
+            else
+            {
+                var memberName = member.Where(member => !rates.Any(r => r.Mid == member.Id)).Select(member => member.TMname).ToList();
+                var assignee = _context.ClickupTaskAssignee.Where(a => memberName.Contains(a.username)).ToList();
+                var tasks = sprinttask.Join(assignee, task => task.id, a => a.taskid, (task, a) => task).ToList();
+                taskdetails = new ViewTaskModel
+                {
+                    Assignees = assignee,
+                    ClikupTasks = tasks,
+                };
+            }
+            return View(taskdetails);
+        }
 
-        /* public IActionResult GenerateSprintPdf([FromQuery(Name = "membersJson")] string membersJson)
+        public IActionResult NewEditTask(string id)
+        {
+            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "-1";
+            if(User.Identity.IsAuthenticated)
+            {
+                var task = _context.ClikupTask.Where(t => t.id == id).FirstOrDefault();
+                if (task == null)
+                {
+                    return NotFound();
+                }
+                var newtask = new ClikupTaskViewModel
+                {
+                    id = task.id,
+                    name = task.name,
+                    description = task.description,
+                    statusvalue = task.statusvalue,
+
+                };
+                return PartialView("_EditTaskPartial", newtask);
+            }
+           return NotFound();
+        }
+
+        /* 
+          public IActionResult EditCliclupTask(string id)
+        {
+            var task = _context.ClikupTask.Where(t => t.id == id).FirstOrDefault();
+            if (task == null)
+            {
+                return NotFound();
+            }
+            var newtask = new ClikupTaskViewModel
+            {
+                id = task.id,
+                name = task.name,
+                description = task.description,
+                statusvalue = task.statusvalue,
+
+            };
+            return View(newtask);
+        } 
+          public IActionResult GenerateSprintPdf([FromQuery(Name = "membersJson")] string membersJson)
          {
              var model = JsonConvert.DeserializeObject<MainSprints>(membersJson);
              var document = new PdfDocument();
@@ -1919,5 +2096,132 @@ return View(teamMembers);
         }
         return NotFound(model);
      */
+    /*
+        Stopwatch stopwatch = new Stopwatch();
+
+           // Start the stopwatch
+           stopwatch.Start();
+           // get the logged in user id
+           //note time 
+           string userId = null;
+           var taskdetails = new ViewTaskModel();
+           if (User.Identity.IsAuthenticated)
+           {
+
+               userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+           }
+           int userId1;
+           int.TryParse(userId, out userId1);
+           var members = _context.TMembers.Where(m => m.LeadId == userId1).ToList();
+           var memberNames = members.Select(m => m.TMname).ToList();
+           var assignees = _context.ClickupTaskAssignee.Where(assignee => memberNames.Contains(assignee.username)).ToList();
+           var assigneetasks = assignees.Select(a => a.taskid).ToList();
+           var tasks = _context.ClikupTask.Where(t => assigneetasks.Contains(t.id)).ToList();
+           //get the sprint for specific id
+           var sprint = _context.Sprint.Where(s => s.Id == id).FirstOrDefault();
+           var sprinttask = tasks.Where(t => (t.date_created >= sprint.SDate && t.date_created <= sprint.EDate) || (t.date_updated >= sprint.SDate && t.date_updated <= sprint.EDate)).ToList();
+           var taskids = sprinttask.Select(t => t.id).ToList();
+           var sprintassignee = assignees.Where(a => taskids.Contains(a.taskid)).ToList();
+           var rating = _context.SprintRating.Where(r => r.SprintId == id).ToList();
+           var ratings = _context.SprintRating.Where(r => r.SprintId == id && r.IsDelete == 0).ToList();
+           var rates = _context.SprintRating.Where(r => r.SprintId == id && r.IsDelete == 1).ToList();
+
+           if (rating.Count == 0 || (ratings.Count == 0 && rates.Count != 0))
+           {
+               taskdetails = new ViewTaskModel
+               {
+                   Assignees = sprintassignee,
+                   ClikupTasks = sprinttask,
+               };
+
+           }
+           else if (ratings.Count != 0)
+           {
+               var names = rating.Select(r => r.Mname).ToList();
+               var assignee = _context.ClickupTaskAssignee.Where(a => names.Contains(a.username)).ToList();
+               var assigneetask = assignee.Select(a => a.taskid).ToList();
+               var task = _context.ClikupTask.Where(t => assigneetask.Contains(t.id)).ToList();
+               var sprinttasks = task.Where(t => (t.date_created >= sprint.SDate && t.date_created <= sprint.EDate) || (t.date_updated >= sprint.SDate && t.date_updated < sprint.EDate)).ToList();
+               var taskid = sprinttask.Select(t => t.id).ToList();
+               var sprintassignees = assignees.Where(a => taskids.Contains(a.taskid)).ToList();
+               taskdetails = new ViewTaskModel
+               {
+                   Assignees = sprintassignees,
+                   ClikupTasks = sprinttasks,
+               };
+
+           }
+           else
+           {
+               var memberName = members.Where(member => !rating.Any(r => r.Mid == member.Id)).Select(member => member.TMname).ToList();
+               var assignee = _context.ClickupTaskAssignee.Where(a => memberName.Contains(a.username)).ToList();
+               var assigneetask = assignee.Select(a => a.taskid).ToList();
+               var task = _context.ClikupTask.Where(t => assigneetask.Contains(t.id)).ToList();
+               var sprinttasks = task.Where(t => (t.date_created >= sprint.SDate && t.date_created <= sprint.EDate) || (t.date_updated >= sprint.SDate && t.date_updated < sprint.EDate)).ToList();
+               var taskid = sprinttask.Select(t => t.id).ToList();
+               var sprintassignees = assignees.Where(a => taskids.Contains(a.taskid)).ToList();
+               taskdetails = new ViewTaskModel
+               {
+                   Assignees = sprintassignees,
+                   ClikupTasks = sprinttasks,
+               };
+
+           }
+
+           // var member = awai _context .Task.Where(t=)
+           stopwatch.Stop();
+           long elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
+
+           // Log or display the elapsed time (for debugging purposes)
+           Console.WriteLine($"ViewTasks method executed in {elapsedMilliseconds} milliseconds");
+           return View(taskdetails);
+       public async Task<IActionResult> ViewRating(int? id)
+      {
+          if (id == null)
+          {
+              return NotFound();
+          }
+          var rating = await _context.Rating
+              .FirstOrDefaultAsync(r => r.MemberId == id);
+          if (rating == null)
+          {
+              var sprintrating = await _context.SprintRating.Where(s => s.Mid == id && s.IsDelete == 0).ToListAsync();
+              var Member = await _context.TMembers.Where(m => m.Id == id).FirstOrDefaultAsync();
+              string mname = Member.TMname;
+              int sumSRating = sprintrating.Sum(s => s.SRating);
+              int countSRating = sprintrating.Count;
+              if (countSRating == 0)
+              {
+                  return BadRequest("There is no any Sprint Rating for this user! Firstly add Sprint Rating then View Whole Rating");
+              }
+              decimal avr = sumSRating / countSRating;
+              var data = new Rating()
+              {
+                  MemberId = Member.Id,
+                  MemberName = mname,
+                  Ratings = (int)avr,
+                  FeedBack = "",
+              };
+
+              _context.Rating.Add(data);
+              _context.SaveChanges();
+              return View(data);
+          }
+
+          var sprintrate = await _context.SprintRating.Where(s => s.Mid == id && s.IsDelete == 0).ToListAsync();
+          int sumSRate = sprintrate.Sum(s => s.SRating);
+          int countSRate = sprintrate.Count;
+          decimal avrs = sumSRate / countSRate;
+          rating.Ratings = (int)avrs;
+          _context.SaveChanges();
+          return View(rating);
+
+          //var sprintrating = await _context.SprintRating.Where(s => s.Mid == id).ToListAsync();
+          //int sumSRating = sprintrating.Sum(s => s.SRating);
+          // int countSRating = sprintrating.Count;
+          // decimal avr = sumSRating / countSRating;
+          // rating.Ratings = (int)avr
+      }*/
+
 }
 

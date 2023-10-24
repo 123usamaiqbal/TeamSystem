@@ -26,6 +26,15 @@ namespace TeamManageSystem.Controllers.Account
 
         public IActionResult Login()
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("TDashboard", "Dashboard");
+            }
+
+            // Prevent caching of the login page.
+            Response.Headers["Cache-Control"] = "no-cache, no-store";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "-1";
             return View();
 
         }
@@ -45,10 +54,10 @@ namespace TeamManageSystem.Controllers.Account
                         if (isValid)
                         {
                             var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, model.Username),
-                    new Claim(ClaimTypes.NameIdentifier, data.Id.ToString())
-                };
+                            {
+                                new Claim(ClaimTypes.Name, model.Username),
+                                new Claim(ClaimTypes.NameIdentifier, data.Id.ToString())
+                            };
 
                             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                             var principal = new ClaimsPrincipal(identity);
@@ -79,10 +88,10 @@ namespace TeamManageSystem.Controllers.Account
                         if (isValid)
                         {
                             var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, model.Username),
-                    new Claim(ClaimTypes.NameIdentifier, data.Id.ToString())
-                };
+                            {
+                                  new Claim(ClaimTypes.Name, model.Username),
+                                  new Claim(ClaimTypes.NameIdentifier, data.Id.ToString())
+                            };
 
                             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                             var principal = new ClaimsPrincipal(identity);
